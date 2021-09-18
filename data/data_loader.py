@@ -3,16 +3,10 @@ from tensorflow.python.keras.preprocessing.image import ImageDataGenerator
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import os
-from os.path import dirname, join as pjoin
 import cv2
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from sklearn.model_selection import train_test_split
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
-import os
 from os.path import dirname, join as pjoin
 import scipy.io as sio
-import numpy as np
 import skimage.io as io
 import skimage.transform as trans
 import numpy as np
@@ -23,7 +17,6 @@ from tensorflow.keras.optimizers import *
 from tensorflow.keras.callbacks import ModelCheckpoint, LearningRateScheduler
 from tensorflow.keras import backend as keras
 from tensorflow.keras import Model
-import cv2
 import random
 from tensorflow.keras.layers import Conv2D, BatchNormalization, Activation, MaxPool2D, Conv2DTranspose, Concatenate, Input, Dense
 from tensorflow.keras.models import Model
@@ -178,7 +171,7 @@ def get_loader(train_input_dir, train_mask_dir, test_input_dir, test_mask_dir):
 
 
 
-
+    Test=(X_test, Y_test)
     traingen = (pair for pair in zip(x, y))
     valgen = (pair for pair in zip(x_val, y_val))
-    return traingen,valgen,X_test, Y_test
+    return traingen,valgen, Test
