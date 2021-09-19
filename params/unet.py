@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 
 
-def Unet_args():
+def UnetRes50():
     parser = ArgumentParser()
     parser.add_argument('--model', type=str, default='UNET', help='model name. Set it UNET')
     parser.add_argument('--epochs', type=int, default=10, help='define number of training epochs')
