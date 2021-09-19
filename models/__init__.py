@@ -1,7 +1,7 @@
-from .resnet50 import UNET1
+from .resnet50 import UnetRes50
 
 
-MODELS = dict(unet=UNET1,
+MODELS = dict(unet=UnetRes50,
               # other models
               )
 

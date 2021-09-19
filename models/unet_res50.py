@@ -26,7 +26,7 @@ from tensorflow.keras.layers import Conv2D, BatchNormalization, Activation, MaxP
 from tensorflow.keras.models import Model
 from tensorflow.keras.applications import ResNet50
 
-class UNET1():
+class UnetRes50():
     def __init__(self, img_w=256, img_h=256, channels=3, **kwargs):
         self.input_shape = (img_w, img_h, channels)
 
