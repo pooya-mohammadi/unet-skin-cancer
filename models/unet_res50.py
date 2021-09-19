@@ -71,7 +71,7 @@ class UnetRes50():
         d4 = decoder_block(d3, s1, 64)                      ## (512 x 512)
 
         """ Output """
-        outputs = Conv2D(2, 1, padding="same", activation="sigmoid")(d4)
+        outputs = Conv2D(1, 1, padding="same", activation="sigmoid")(d4)
         model = Model(inputs, outputs, name="ResNet50_U-Net")
         model.summary()
 
