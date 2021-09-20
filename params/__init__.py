@@ -1,6 +1,5 @@
-from .resnet50 import resnet50_args
-
-ARGUMENTS = dict(resnet50=resnet50_args,
+from .unet import UnetRes50
+ARGUMENTS = dict(unet = UnetRes50
                  # other args
                  )
 
