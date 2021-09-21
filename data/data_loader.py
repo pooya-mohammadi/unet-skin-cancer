@@ -34,7 +34,14 @@ def unison_shuffle(a,b):
     inx=np.random.permutation(a.shape[0])
     return a[inx],b[inx]
 
-def get_loader(train_input_dir, train_mask_dir, test_input_dir, test_mask_dir):
+def get_loader(train_input_dir, train_mask_dir, test_input_dir, test_mask_dir,
+                rotation_range,
+                width_shift_range,
+                height_shift_range,
+                shear_range,
+                zoom_range,
+                fill_mode,
+                horizontal_flip):
     
     #should there be only one direction?
     #how are we supposed to get the other 4 directions of train test and images and masks for each
@@ -91,60 +98,31 @@ def get_loader(train_input_dir, train_mask_dir, test_input_dir, test_mask_dir):
 
     X_train = X_train/255
     X_test = X_test/255
-    Y_train = Y_train/255
-    Y_test = Y_test/255
+    Y_train = Y_train
+    Y_test = Y_test
 
-
-    # datagen = ImageDataGenerator(
-    # rotation_range=45,
-    # horizontal_flip=True,
-    # vertical_flip=True,
-    # zoom_range=0.4,
-    # validation_split=0.2,
-    # rescale=1./255
-    # )
-    print("Xtrain shape", X_train.shape)
-    print("ytrain shape", Y_train.shape)
-    print("Xtest shape", X_test.shape)
-    print("ytest shape", Y_test.shape)
     Y_train = np.expand_dims(Y_train, axis=3)
     Y_test = np.expand_dims(Y_test, axis=3)
 
     image_datagen = ImageDataGenerator(
-    rotation_range=30,
-    # width_shift_range=10,
-    # height_shift_range=10,
-    #brightness_range=(0.3, 1.8),
-    shear_range=5,
-    zoom_range=0.2,
-    fill_mode = 'wrap',
-    horizontal_flip = True
+    rotation_range = rotation_range,
+    width_shift_range = width_shift_range,
+    height_shift_range = height_shift_range,
+    shear_range = shear_range,
+    zoom_range = zoom_range,
+    fill_mode = fill_mode,
+    horizontal_flip = horizontal_flip
     )
 
     mask_datagen = ImageDataGenerator(
-    rotation_range=30,
-    # width_shift_range=10,
-    # height_shift_range=10,
-    #brightness_range=(0.3, 1.8),
-    shear_range=5,
-    zoom_range=0.2,
-    fill_mode = 'wrap',
-    horizontal_flip = True
+    rotation_range = rotation_range,
+    width_shift_range = width_shift_range,
+    height_shift_range = height_shift_range,
+    shear_range = shear_range,
+    zoom_range = zoom_range,
+    fill_mode = fill_mode,
+    horizontal_flip = horizontal_flip
     )
-
-    datagen_test = ImageDataGenerator(
-    rotation_range=45,
-    horizontal_flip=True,
-    vertical_flip=True,
-    zoom_range=0.4
-    )
-
-    print("salam")
-
-    # trainX, trainy = unison_shuffle(trainX,trainy)
-    # testX, testy = unison_shuffle(testX,testy)
-
-  # trainX, valX, trainy, validy = train_test_split(data, labels, test_size=0.33, shuffle= True)
 
     seed = 909
     image_datagen.fit(X_train[:int(X_train.shape[0]*0.8)], augment=True, seed=seed)
@@ -152,8 +130,6 @@ def get_loader(train_input_dir, train_mask_dir, test_input_dir, test_mask_dir):
 
     x=image_datagen.flow(X_train[:int(X_train.shape[0]*0.8)],batch_size=32,shuffle=True, seed=seed)
     y=mask_datagen.flow(Y_train[:int(Y_train.shape[0]*0.8)],batch_size=32,shuffle=True, seed=seed)
-
-
 
 # Creating the validation Image and Mask generator
     image_datagen_val = ImageDataGenerator()
@@ -164,12 +140,6 @@ def get_loader(train_input_dir, train_mask_dir, test_input_dir, test_mask_dir):
 
     x_val=image_datagen_val.flow(X_train[int(X_train.shape[0]*0.8):],batch_size=32,shuffle=True, seed=seed)
     y_val=mask_datagen_val.flow(Y_train[int(Y_train.shape[0]*0.8):],batch_size=32,shuffle=True, seed=seed)
-
-    # traingen=datagen.flow(trainX,trainy,batch_size=8,subset='training')
-    # valgen=datagen.flow(trainX,trainy,batch_size=8,subset='validation')
-    # testgen=datagen.flow(testX,testy,batch_size=8)
-
-
 
     Test=(X_test, Y_test)
     traingen = (pair for pair in zip(x, y))
