@@ -1,7 +1,8 @@
 from .unet_res50 import UnetRes50
+from .unet2 import Unet2
 
-
-MODELS = dict(unet=UnetRes50,
+MODELS = dict(unet_res50=UnetRes50,
+              unet_conv_deconv = Unet2,
               # other models
               )
 
