@@ -1,5 +1,5 @@
 """
-This module contains models for resent50
+This module contains models for unet_conv_deconv
 It's but an example. Modify it as you wish.
 """
 
