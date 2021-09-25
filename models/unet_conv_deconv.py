@@ -17,7 +17,7 @@ from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.applications import ResNet50
 
 
-class Unet2():
+class Unet_conv_deconv():
     def __init__(self, img_w=256, img_h=256, channels=3, **kwargs):
         self.input_shape = (img_w, img_h, channels)
 
