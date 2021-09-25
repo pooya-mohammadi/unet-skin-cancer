@@ -1,7 +1,9 @@
-from .unet import UnetRes50
-ARGUMENTS = dict(unet = UnetRes50
-                 # other args
-                 )
+from .unet_res50 import unetRes50_args
+from . unet_conv_deconv import unetConvDeconv_args
+ARGUMENTS = dict(unet_res50 = unetRes50_args,
+                 unet_conv_deconv = unetConvDeconv_args,
+              # other models
+              )
 
 
 def get_args(model_name):
