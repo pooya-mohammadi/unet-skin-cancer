@@ -3,12 +3,15 @@ import sys
 from tensorflow.keras import callbacks
 from models import load_model
 from params import get_args
-from data.data_loader import get_loader
+from data.data_loader import data_loader
 from tensorflow.keras.models import *
 from tensorflow.keras.layers import *
 from tensorflow.keras.optimizers import *
 from tensorflow.keras.callbacks import ModelCheckpoint, LearningRateScheduler, EarlyStopping
 from utils.callbacks import *
+from utils.utils import get_gpu_grower
+
+get_gpu_grower()
 
 def train():
     model_name = sys.argv[2]
