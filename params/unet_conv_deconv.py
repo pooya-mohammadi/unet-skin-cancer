@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 
 
-def UnetConvDeconv():
+def unetConvDeconv_args():
     parser = ArgumentParser()
     parser.add_argument('--model', type=str, default='unet_conv_deconv', help='model name. Set it unet_conv_deconv')
     parser.add_argument('--epochs', type=int, default= 14, help='define number of training epochs')
