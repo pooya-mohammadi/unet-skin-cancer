@@ -1,14 +1,19 @@
 import sys
 
 from tensorflow.keras import callbacks
+import sys
+from datetime import datetime
+from os.path import join
 from models import load_model
 from params import get_args
-from data.data_loader import data_loader
-from tensorflow.keras.models import *
-from tensorflow.keras.layers import *
-from tensorflow.keras.optimizers import *
-from tensorflow.keras.callbacks import ModelCheckpoint, LearningRateScheduler, EarlyStopping
-from utils.callbacks import *
+from data.data_loader import get_loader
+from tensorflow.keras.optimizers import Adam
+import mlflow
+from utils.callbacks import get_callbacks
+from utils.mlflow_handler import MLFlowHandler
+from utils.plots import get_plots
+from utils.metrics import dice, iou
+from utils.loss import dice_loss, jaccard_loss, focal_tversky_loss
 from utils.utils import get_gpu_grower
 
 get_gpu_grower()
@@ -18,29 +23,55 @@ def train():
     print(f"Chosen Model: {model_name}")
     args = get_args(model_name)
     print(f"Arguments: {args}")
-    train_loader, val_loader, test_loader = get_loader(args.train_path, args.test_path, 
-                                                       args.mask_train_path, args.mask_test_path,
-                                                       args.rotation_range, args.width_shift_range,
-                                                       args.height_shift_range, args.shear_range,
-                                                       args.zoom_range, args.fill_mode,
-                                                       args.horizontal_flip)
-    model = load_model(model_name=model_name, **args)
 
+    id_ = model_name + "_" + str(datetime.now().date()) + "_" + str(datetime.now().time())
+    weight_path = join('weights', id_) + ".h5"
+    mlflow_handler = MLFlowHandler(model_name=model_name, run_name=id_)
+    mlflow_handler.start_run(args)
+
+    #adjust paths for data_loader(add user path to folder path for each dataset)
+    train_path = args.train_path + "/ISBI2016_ISIC_Part1_Training_Data"
+    mask_train_path = args.mask_train_path + "/ISBI2016_ISIC_Part1_Training_GroundTruth"
+    test_path = args.test_path + "/ISBI2016_ISIC_Part1_Test_Data"
+    mask_test_path = args.mask_test_path + "/ISBI2016_ISIC_Part1_Test_GroundTruth"
+
+    # Loading model
+    train_loader, val_loader, test_loader = get_loader(train_path, mask_train_path,
+                                                       test_path, mask_test_path,
+                                                       args.rotation_range, args.horizontal_flip,
+                                                       args.vertical_flip, args.center_crop)
+    print("Loading Data is Done!")
+
+    model = load_model(model_name=model_name)
+    print("Loading Model is Done!")
     # training
-    model.compile(optimizer = Adam(learning_rate = args.lr), loss = args.loss, 
-              metrics = ['accuracy'])
-        
-    batch_size = 8
-    train_step = int((900*0.8)/batch_size)
-    val_step = int((900*0.2)/batch_size)
 
-    history = model.fit_generator(train_loader, steps_per_epoch=train_step, epochs=args.epoch,
-                              validation_data=val_loader, validation_steps=val_step,
-                              callbacks = [get_callbacks])
+    Modelcheckpoint, _, _, estop_callback, lr_callback = get_callbacks(model_path = weight_path,
+                                                                       early_stopping_p=5,
+                                                                       mlflow=mlflow,
+                                                                       args=args)
+    if (args.loss == 'dice_loss'):
+        loss = dice_loss
+    elif (args.loss == 'jaccard_loss'):
+        loss = jaccard_loss
+    elif (arg.loss == 'focal_tversky_loss'):
+        loss = focal_tversky_loss
 
-    #Save model
-    model.save_weights("unet_model.h5")
-    #Load model
-    model.load_weights("unet_model.h5")
+    model.compile(optimizer=Adam(learning_rate=args.lr), loss=loss,
+                  metrics=['accuracy', dice, iou])
+
+    print("Training ....")
+    history = model.fit(train_loader[0], train_loader[1], batch_size=args.batch_size
+                        , epochs=args.epochs, validation_data=(val_loader[0], val_loader[1]),
+                        callbacks=[estop_callback, Modelcheckpoint , mlflow_handler.mlflow_logger])
+
+    print("Training is done")
+    # Load model
+    # model.load_weights("unet_model.h5")
+
+    get_plots(model, test_loader, args, mlflow_handler)
+    mlflow_handler.end_run(weight_path)
+
+
 if __name__ == '__main__':
     train()
