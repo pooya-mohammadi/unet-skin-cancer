@@ -1,5 +1,6 @@
 MODELS_TO_ADDR = {
-    "unet": 'weights/unet/weights',
+    "unet-res50": 'weights/unet_res50/weights',
+    "unet-conv-deconv" : 'weights/unet_conv_deconv/weights',
 }
 
 MODELS_TO_ARGS = {

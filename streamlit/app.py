@@ -63,7 +63,7 @@ if 'image' in st.session_state:
     process_btn = select_image_col2.button("Process Image")
 
 # page body
-st.markdown('**Cell Segmentation** with **``%s``**' % models_option)
+st.markdown('**Skin Cancer Segmentation** with **``%s``**' % models_option)
 body_col1, body_col2 = st.columns(2)
 
 if 'image' in st.session_state:
