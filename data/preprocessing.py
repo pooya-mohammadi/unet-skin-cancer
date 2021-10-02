@@ -19,7 +19,7 @@ def preprocessing(train_zip, test_zip, mask_train_zip, mask_test_zip,
         with ZipFile(BytesIO(zip_mask_test.read())) as zfile:
             zfile.extractall(mask_test_path)
     print("Preprocessing is done")
-if __name__ == "main":
+if __name__ == "__main__":
     parser = ArgumentParser()
 
     parser.add_argument("--train_zip_url", default="https://isic-challenge-data.s3.amazonaws.com/2016/ISBI2016_ISIC_Part1_Training_Data.zip")
@@ -31,7 +31,7 @@ if __name__ == "main":
     parser.add_argument("--mask_train_path", default="./masktrain")
     parser.add_argument("--mask_test_path", default="./masktest")
 
-    args = parser.parse_args()
+    args = parser.parse_args(args=[])
     print(args.train_zip_url)
     preprocessing(args.train_zip_url, args.test_zip_url, args.mask_train_zip_url, args.mask_test_zip_url,
                 args.train_path, args.test_path, args.mask_train_path, args.mask_test_path)
