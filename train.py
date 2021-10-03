@@ -55,7 +55,7 @@ def train():
         loss = dice_loss
     elif (args.loss == 'jaccard_loss'):
         loss = jaccard_loss
-    elif (arg.loss == 'focal_tversky_loss'):
+    elif (args.loss == 'focal_tversky_loss'):
         loss = focal_tversky_loss
 
     model.compile(optimizer=Adam(learning_rate=args.lr), loss=loss,
