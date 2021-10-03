@@ -1,5 +1,6 @@
 import sys
 
+import numpy as np
 from tensorflow.keras import callbacks
 import sys
 from datetime import datetime
@@ -64,7 +65,6 @@ def train():
     history = model.fit(train_loader[0], np.concatenate([train_loader[1],train_loader[1]],axis=-1), batch_size=args.batch_size
                         , epochs=args.epochs, validation_data=(val_loader[0], np.concatenate([val_loader[1],val_loader[1]],axis=-1)),
                         callbacks=[estop_callback, Modelcheckpoint , mlflow_handler.mlflow_logger])
-                  )
     print("Training is done")
     # Load model
     # model.load_weights("unet_model.h5")
