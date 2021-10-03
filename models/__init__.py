@@ -1,8 +1,10 @@
 from .unet_res50 import UnetRes50
 from .unet_conv_deconv import UnetConvDeconv
+from .doubleunet import DoubleUnet
 
 MODELS = dict(unet_res50=UnetRes50,
               unet_conv_deconv=UnetConvDeconv,
+              double_unet=DoubleUnet
               # other models
               )
 

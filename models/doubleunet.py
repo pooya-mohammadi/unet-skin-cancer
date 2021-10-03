@@ -136,7 +136,7 @@ def ASPP(x, filter):
 
     return y
 
-def build_dou_unet(shape):
+def DoubleUnet(shape):
     inputs = Input(shape)
     x, skip_1 = encoder1(inputs)
     x = ASPP(x, 64)
