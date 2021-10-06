@@ -3,6 +3,7 @@ from tensorflow.keras.layers import *
 from tensorflow.keras.models import Model
 from tensorflow.keras.applications import *
 
+
 def squeeze_excite_block(inputs, ratio=8):
     init = inputs
     channel_axis = -1
@@ -16,6 +17,7 @@ def squeeze_excite_block(inputs, ratio=8):
 
     x = Multiply()([init, se])
     return x
+
 
 def conv_block(inputs, filters):
     x = inputs
@@ -32,6 +34,7 @@ def conv_block(inputs, filters):
 
     return x
 
+
 def encoder1(inputs):
     skip_connections = []
 
@@ -42,6 +45,7 @@ def encoder1(inputs):
 
     output = model.get_layer("block5_conv4").output
     return output, skip_connections
+
 
 def decoder1(inputs, skip_connections):
     num_filters = [256, 128, 64, 32]
@@ -54,6 +58,7 @@ def decoder1(inputs, skip_connections):
         x = conv_block(x, f)
 
     return x
+
 
 # def encoder2(inputs):
 #     skip_connections = []
@@ -80,6 +85,7 @@ def encoder2(inputs):
 
     return x, skip_connections
 
+
 def decoder2(inputs, skip_1, skip_2):
     num_filters = [256, 128, 64, 32]
     skip_2.reverse()
@@ -92,16 +98,21 @@ def decoder2(inputs, skip_1, skip_2):
 
     return x
 
+
 def output_block(inputs):
     x = Conv2D(1, (1, 1), padding="same")(inputs)
     x = Activation('sigmoid')(x)
     return x
 
+
 def Upsample(tensor, size):
     """Bilinear upsampling"""
+
     def _upsample(x, size):
         return tf.image.resize(images=x, size=size)
+
     return Lambda(lambda x: _upsample(x, size), output_shape=size)(tensor)
+
 
 def ASPP(x, filter):
     shape = x.shape
@@ -136,20 +147,25 @@ def ASPP(x, filter):
 
     return y
 
-def DoubleUnet(shape):
-    inputs = Input(shape)
-    x, skip_1 = encoder1(inputs)
-    x = ASPP(x, 64)
-    x = decoder1(x, skip_1)
-    outputs1 = output_block(x)
 
-    x = inputs * outputs1
+class DoubleUnet:
+    def __init__(self, shape=(256, 256, 3)):
+        self.shape = shape
 
-    x, skip_2 = encoder2(x)
-    x = ASPP(x, 64)
-    x = decoder2(x, skip_1, skip_2)
-    outputs2 = output_block(x)
-    outputs = Concatenate()([outputs1, outputs2])
+    def get_model(self):
+        inputs = Input(self.shape)
+        x, skip_1 = encoder1(inputs)
+        x = ASPP(x, 64)
+        x = decoder1(x, skip_1)
+        outputs1 = output_block(x)
 
-    model = Model(inputs, outputs)
-    return model
+        x = inputs * outputs1
+
+        x, skip_2 = encoder2(x)
+        x = ASPP(x, 64)
+        x = decoder2(x, skip_1, skip_2)
+        outputs2 = output_block(x)
+        outputs = Concatenate()([outputs1, outputs2])
+
+        model = Model(inputs, outputs)
+        return model
