@@ -21,6 +21,7 @@ class MLFlowLogger(Callback):
         self.mlflow.log_metric('val_dice', logs['val_dice'])
         self.mlflow.log_metric('train_iou', logs['iou'])
         self.mlflow.log_metric('val_iou', logs['val_iou'])
+
     def on_train_begin(self, logs=None):
         self.mlflow.log_param('optimizer_name', type(self.model.optimizer).__name__)
 
