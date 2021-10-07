@@ -3,14 +3,10 @@ from .main import main_args
 
 def doubleunet_args():
     parser = main_args()
-    parser.add_argument('--model', type=str, default='doubleunet', help='model name. Set it doubleunet')
+    parser.add_argument('--model', type=str, default='double_unet', help='model name. Set it double_unet')
 
-    parser.add_argument('--loss', default="dice_loss", help='define loss function of model')
-    # Arguments of path directions in dataloader
-    parser.add_argument("--train_path", default="data/train", help='define train path images')
-    parser.add_argument("--test_path", default="data/test", help='define test path images')
-    parser.add_argument("--mask_train_path", default="data/masktrain", help='define mask of train path images')
-    parser.add_argument("--mask_test_path", default="data/masktest", help='define mask of test path images')
+    # parser.add_argument('--loss', default="dice_loss", help='define loss function of model')
+
     # Arguments for Augmentation in dataloader
     parser.add_argument("--rotation_range", type=float, default=0.5, help='Range of rotation of images')
     parser.add_argument("--horizontal_flip", type=float, default=1.0, help='Whether flip horizontally or not')
