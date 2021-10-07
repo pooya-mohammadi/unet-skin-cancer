@@ -1,6 +1,6 @@
 from .unet_res50 import unetRes50_args
 from .unet_conv_deconv import unetConvDeconv_args
-from .doubleunet import doubleunet_args
+from .doubleـunet import doubleunet_args
 
 ARGUMENTS = dict(unet_res50=unetRes50_args,
                  unet_conv_deconv=unetConvDeconv_args,

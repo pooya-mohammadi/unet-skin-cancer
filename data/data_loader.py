@@ -1,110 +1,129 @@
-from typing import Tuple
-from tensorflow.python.keras.preprocessing.image import ImageDataGenerator
 import os
+import math
 import cv2
-from os.path import dirname, join as pjoin
 from sklearn.model_selection import train_test_split
 import numpy as np
-import tensorflow as tf
-from tensorflow.keras import backend as keras
-import random
 import albumentations as A
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
+import tensorflow as tf
 
 
-def unison_shuffle(a, b):
-    inx = np.random.permutation(a.shape[0])
-    return a[inx], b[inx]
+class DataGenerator(tf.keras.utils.Sequence):
+    def __init__(self, img_list,
+                 mask_list,
+                 batch_size=16,
+                 img_size=(256, 256),
+                 img_channel=3,
+                 augmentation_p: float = 0,
+                 shuffle=True,
+                 double_unet=False,
+                 p_random_rotate_90=0.5,
+                 p_horizontal_flip=0.5,
+                 p_vertical_flip=0.5,
+                 p_center_crop=0.1):
+        self.img_paths = np.array(img_list)
+        self.mask_paths = np.array(mask_list)
+
+        self.batch_size = batch_size
+        self.shuffle = shuffle
+        self.mask_channel = 2 if double_unet else 1
+        self.transform = A.Compose([
+            A.RandomRotate90(p=p_random_rotate_90),
+            A.VerticalFlip(p=p_vertical_flip),
+            A.HorizontalFlip(p=p_horizontal_flip),
+            A.CenterCrop(p=p_center_crop, height=256, width=256),
+        ], p=augmentation_p)
+        self.img_size = img_size
+        self.img_channel = img_channel
+        self.on_epoch_end()
+
+    def on_epoch_end(self):
+        if self.shuffle:
+            indices = np.random.permutation(len(self.img_paths)).astype(np.int)
+            self.img_paths, self.mask_paths = self.img_paths[indices], self.mask_paths[indices]
+
+    def __len__(self):
+        return math.ceil(len(self.img_paths) / self.batch_size)
+
+    def __getitem__(self, idx):
+        batch_img = self.img_paths[idx * self.batch_size:(idx + 1) * self.batch_size]
+        batch_mask = self.mask_paths[idx * self.batch_size:(idx + 1) * self.batch_size]
+        x = np.zeros((self.batch_size, *self.img_size, self.img_channel), dtype=float)
+        y = np.zeros((self.batch_size, *self.img_size), dtype=float)
+
+        for i, (img_path, mask_path) in enumerate(zip(batch_img, batch_mask)):
+            img = cv2.imread(img_path)
+            mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+            augmented = self.transform(image=img, mask=mask)
+            x[i] = cv2.resize(augmented['image'], self.img_size)
+            y[i] = cv2.resize(augmented['mask'], self.img_size, interpolation=cv2.INTER_NEAREST)
+        y = y.reshape((self.batch_size, *self.img_size, 1)) / 255
+        y = np.concatenate([y] * self.mask_channel, axis=-1)
+        return x / 255, y
 
 
-def get_loader(train_input_dir, train_mask_dir, test_input_dir, test_mask_dir,
-               p_RandomRotate90=0.5,
-               p_HorizontalFlip=1,
-               p_VerticalFlip=0.5,
-               p_CenterCrop=0.9):
+def get_loader(train_input_dir,
+               train_mask_dir,
+               test_input_dir,
+               test_mask_dir,
+               model_name,
+               val_size=0.1,
+               batch_size=32,
+               img_size=(256, 256)):
     # should there be only one direction?
     # how are we supposed to get the other 4 directions of train test and images and masks for each
 
-    train_input_img_paths = sorted(
+    train_img_paths = sorted(
         [
             os.path.join(train_input_dir, fname)
             for fname in os.listdir(train_input_dir)
             if fname.endswith(".jpg")
         ]
     )
-    train_input_array_list = [cv2.resize(mpimg.imread(str_index), (256, 256))
-                              for str_index in train_input_img_paths]
 
-    train_mask_img_paths = sorted(
+    train_mask_paths = sorted(
         [
             os.path.join(train_mask_dir, fname)
             for fname in os.listdir(train_mask_dir)
             if fname.endswith(".png")
         ]
     )
-    train_mask_array_list = [cv2.resize(mpimg.imread(str_index), (256, 256))
-                             for str_index in train_mask_img_paths]
-
-    test_input_img_paths = sorted(
+    train_img_paths, val_img_paths, train_mask_paths, val_mask_paths = train_test_split(train_img_paths,
+                                                                                        train_mask_paths,
+                                                                                        test_size=val_size,
+                                                                                        shuffle=True)
+    test_img_paths = sorted(
         [
             os.path.join(test_input_dir, fname)
             for fname in os.listdir(test_input_dir)
             if fname.endswith(".jpg")
         ]
     )
-    test_input_array_list = [cv2.resize(mpimg.imread(str_index), (256, 256))
-                             for str_index in test_input_img_paths]
 
-    test_mask_img_paths = sorted(
+    test_mask_paths = sorted(
         [
             os.path.join(test_mask_dir, fname)
             for fname in os.listdir(test_mask_dir)
             if fname.endswith(".png")
         ]
     )
-    test_mask_array_list = [cv2.resize(mpimg.imread(str_index), (256, 256))
-                            for str_index in test_mask_img_paths]
-
-    X_train_list, Y_train_list = train_input_array_list, train_mask_array_list
-    X_test_list, Y_test_list = test_input_array_list, test_mask_array_list
-
-    image_padded = []
-    mask_padded = []
-    for i in range(0, len(X_train_list)):
-        aug = A.Compose([
-            A.RandomRotate90(p=p_RandomRotate90),
-            A.VerticalFlip(p=p_VerticalFlip),
-            A.HorizontalFlip(p=p_HorizontalFlip),
-            A.CenterCrop(p=p_CenterCrop, height=256, width=256),
-        ], p=1)
-        augmented = aug(image=X_train_list[i], mask=Y_train_list[i])
-        image_padded.append(augmented['image'])
-        mask_padded.append(augmented['mask'])
-
-    X_train_list = X_train_list + image_padded
-    Y_train_list = Y_train_list + mask_padded
-
-    X_train = np.array(X_train_list)
-    X_test = np.array(X_test_list)
-    Y_train = np.array(Y_train_list)
-    Y_test = np.array(Y_test_list)
-
-    X_train = X_train / 255
-    X_test = X_test / 255
-    Y_train = Y_train
-    Y_test = Y_test
-
-    print("Xtrain shape", X_train.shape)
-    print("ytrain shape", Y_train.shape)
-    print("Xtest shape", X_test.shape)
-    print("ytest shape", Y_test.shape)
-    Y_train = np.expand_dims(Y_train, axis=3)
-    Y_test = np.expand_dims(Y_test, axis=3)
-
-    trainX, valX, trainy, valy = train_test_split(X_train, Y_train, test_size=0.2, shuffle=True)
-
-    train = (trainX, trainy)
-    validation = (valX, valy)
-    test = (X_test, Y_test)
-    return train, validation, test
+    double_unet = True if model_name == 'double_unet' else False
+    train = DataGenerator(train_img_paths,
+                          train_mask_paths,
+                          batch_size=batch_size,
+                          img_size=img_size,
+                          augmentation_p=0.5,
+                          double_unet=double_unet)
+    val = DataGenerator(val_img_paths,
+                        val_mask_paths,
+                        batch_size=batch_size,
+                        img_size=img_size,
+                        augmentation_p=0.5,
+                        double_unet=double_unet)
+    test = DataGenerator(test_img_paths,
+                         test_mask_paths,
+                         batch_size=batch_size,
+                         img_size=img_size,
+                         augmentation_p=0,
+                         shuffle=False,
+                         double_unet=double_unet)
+    return train, val, test

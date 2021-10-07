@@ -37,8 +37,8 @@ def train():
     # Loading model
     train_loader, val_loader, test_loader = get_loader(train_path, mask_train_path,
                                                        test_path, mask_test_path,
-                                                       args.rotation_range, args.horizontal_flip,
-                                                       args.vertical_flip, args.center_crop)
+                                                       batch_size=args.batch_size,
+                                                       model_name=model_name)
     print("Loading Data is Done!")
 
     model = load_model(model_name=model_name)
@@ -49,22 +49,23 @@ def train():
                                                                        early_stopping_p=5,
                                                                        mlflow=mlflow,
                                                                        args=args)
-    if (args.loss == 'dice_loss'):
+    if args.loss == 'dice_loss':
         loss = dice_loss
-    elif (args.loss == 'jaccard_loss'):
+    elif args.loss == 'jaccard_loss':
         loss = jaccard_loss
-    elif (args.loss == 'focal_tversky_loss'):
+    elif args.loss == 'focal_tversky_loss':
         loss = focal_tversky_loss
-
+    else:
+        raise Exception()
     model.compile(optimizer=Adam(learning_rate=args.lr), loss=loss,
                   metrics=['accuracy', dice, iou])
 
     print("Training ....")
-    model.fit(train_loader[0], np.concatenate([train_loader[1], train_loader[1]], axis=-1),
-                        batch_size=args.batch_size
-                        , epochs=args.epochs,
-                        validation_data=(val_loader[0], np.concatenate([val_loader[1], val_loader[1]], axis=-1)),
-                        callbacks=[estop_callback, Modelcheckpoint, mlflow_handler.mlflow_logger])
+    model.fit(train_loader,
+              batch_size=args.batch_size
+              , epochs=args.epochs,
+              validation_data=val_loader,
+              callbacks=[estop_callback, Modelcheckpoint, mlflow_handler.mlflow_logger])
     print("Training is done")
     get_plots(model, test_loader, args, mlflow_handler)
     mlflow_handler.end_run(weight_path)

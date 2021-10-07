@@ -5,6 +5,7 @@ import random
 
 
 def image_plot(testloader, Y_pred):
+    figures = []
     for i in range(5):
         index = random.randint(0, 379)
         plt.subplots_adjust(left=0.1, bottom=0.1, right=0.9, top=0.9, wspace=0.9, hspace=0.9)
@@ -25,13 +26,13 @@ def image_plot(testloader, Y_pred):
 def get_plots(model, test_loader, args, mlflow_handler: MLFlowHandler):
     # Metrics: Test: Loss, Acc, Dice, Iou
     print('Evaluation')
-    Y_pred = model.predict(test_loader[0])
+    Y_pred = model.predict(test_loader)
 
-    test_score = model.evaluate(test_loader[0], test_loader[1])  # test data
+    test_score = model.evaluate(test_loader)  # test data
     print(f'Test: Loss= {test_score[0]}, Accuracy: {test_score[1]}')
     print(f'Test: Dice= {test_score[2]}, Iou: {test_score[3]}')
 
-    figures = []
+
 
     # Metrics: Confusion Matrix
 
