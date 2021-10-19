@@ -63,19 +63,24 @@ class DataGenerator(tf.keras.utils.Sequence):
             for i, (img_path, mask_path) in enumerate(zip(batch_img, batch_mask)):
                 img = cv2.imread(img_path)
                 mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+                img = cv2.resize(img, self.img_size)
+                mask = cv2.resize(mask, self.img_size, interpolation=cv2.INTER_NEAREST)
                 if self.usual_aug_with_cutmix:
                     augmented = self.transform(image=img, mask=mask)
                     img, mask = augmented['image'], augmented['mask']
-                x[i] = cv2.resize(img, self.img_size)
-                y[i] = cv2.resize(mask, self.img_size, interpolation=cv2.INTER_NEAREST)
+                x[i] = img
+                y[i] = mask
             x, y = CutMix.apply_cutmix(self.beta, image_a=x, image_b=x, mask_a=y, mask_b=y)
         else:
             for i, (img_path, mask_path) in enumerate(zip(batch_img, batch_mask)):
                 img = cv2.imread(img_path)
                 mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+                img = cv2.resize(img, self.img_size)
+                mask = cv2.resize(mask, self.img_size, interpolation=cv2.INTER_NEAREST)
                 augmented = self.transform(image=img, mask=mask)
-                x[i] = cv2.resize(augmented['image'], self.img_size)
-                y[i] = cv2.resize(augmented['mask'], self.img_size, interpolation=cv2.INTER_NEAREST)
+                x[i] = augmented['image']
+                y[i] = augmented['mask']
+
         y = y.reshape((self.batch_size, *self.img_size, 1)) / 255
         y = np.concatenate([y] * self.mask_channel, axis=-1)
         return x / 255, y
