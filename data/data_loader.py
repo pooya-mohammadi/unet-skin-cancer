@@ -1,15 +1,20 @@
 import os
 import math
+import random
 import cv2
 from sklearn.model_selection import train_test_split
 import numpy as np
 import albumentations as A
 import tensorflow as tf
+from utils.cutmix_augmentation import CutMix
 
 
 class DataGenerator(tf.keras.utils.Sequence):
     def __init__(self, img_list,
                  mask_list,
+                 cutmix_p,
+                 beta,
+                 usual_aug_with_cutmix,
                  batch_size=16,
                  img_size=(256, 256),
                  img_channel=3,
@@ -19,12 +24,14 @@ class DataGenerator(tf.keras.utils.Sequence):
                  p_random_rotate_90=0.5,
                  p_horizontal_flip=0.5,
                  p_vertical_flip=0.5,
-                 p_center_crop=0.1):
+                 p_center_crop=0.1,
+                 ):
         self.img_paths = np.array(img_list)
         self.mask_paths = np.array(mask_list)
 
         self.batch_size = batch_size
         self.shuffle = shuffle
+        self.usual_aug_with_cutmix = usual_aug_with_cutmix
         self.mask_channel = 2 if double_unet else 1
         self.transform = A.Compose([
             A.RandomRotate90(p=p_random_rotate_90),
@@ -34,6 +41,8 @@ class DataGenerator(tf.keras.utils.Sequence):
         ], p=augmentation_p)
         self.img_size = img_size
         self.img_channel = img_channel
+        self.cutmix_p = cutmix_p
+        self.beta = beta
         self.on_epoch_end()
 
     def on_epoch_end(self):
@@ -47,15 +56,26 @@ class DataGenerator(tf.keras.utils.Sequence):
     def __getitem__(self, idx):
         batch_img = self.img_paths[idx * self.batch_size:(idx + 1) * self.batch_size]
         batch_mask = self.mask_paths[idx * self.batch_size:(idx + 1) * self.batch_size]
-        x = np.zeros((self.batch_size, *self.img_size, self.img_channel), dtype=float)
-        y = np.zeros((self.batch_size, *self.img_size), dtype=float)
-
-        for i, (img_path, mask_path) in enumerate(zip(batch_img, batch_mask)):
-            img = cv2.imread(img_path)
-            mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
-            augmented = self.transform(image=img, mask=mask)
-            x[i] = cv2.resize(augmented['image'], self.img_size)
-            y[i] = cv2.resize(augmented['mask'], self.img_size, interpolation=cv2.INTER_NEAREST)
+        x = np.zeros((self.batch_size, *self.img_size, self.img_channel), dtype=np.uint8)
+        y = np.zeros((self.batch_size, *self.img_size), dtype=np.uint8)
+        rnd_p = random.random()
+        if rnd_p < self.cutmix_p:
+            for i, (img_path, mask_path) in enumerate(zip(batch_img, batch_mask)):
+                img = cv2.imread(img_path)
+                mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+                if self.usual_aug_with_cutmix:
+                    augmented = self.transform(image=img, mask=mask)
+                    img, mask = augmented['image'], augmented['mask']
+                x[i] = cv2.resize(img, self.img_size)
+                y[i] = cv2.resize(mask, self.img_size, interpolation=cv2.INTER_NEAREST)
+            x, y = CutMix.apply_cutmix(self.beta, image_a=x, image_b=x, mask_a=y, mask_b=y)
+        else:
+            for i, (img_path, mask_path) in enumerate(zip(batch_img, batch_mask)):
+                img = cv2.imread(img_path)
+                mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+                augmented = self.transform(image=img, mask=mask)
+                x[i] = cv2.resize(augmented['image'], self.img_size)
+                y[i] = cv2.resize(augmented['mask'], self.img_size, interpolation=cv2.INTER_NEAREST)
         y = y.reshape((self.batch_size, *self.img_size, 1)) / 255
         y = np.concatenate([y] * self.mask_channel, axis=-1)
         return x / 255, y
@@ -68,7 +88,8 @@ def get_loader(train_input_dir,
                model_name,
                val_size=0.1,
                batch_size=32,
-               img_size=(256, 256)):
+               img_size=(256, 256),
+               **kwargs):
     # should there be only one direction?
     # how are we supposed to get the other 4 directions of train test and images and masks for each
 
@@ -112,18 +133,18 @@ def get_loader(train_input_dir,
                           batch_size=batch_size,
                           img_size=img_size,
                           augmentation_p=0.5,
-                          double_unet=double_unet)
+                          double_unet=double_unet, **kwargs)
     val = DataGenerator(val_img_paths,
                         val_mask_paths,
                         batch_size=batch_size,
                         img_size=img_size,
                         augmentation_p=0.5,
-                        double_unet=double_unet)
+                        double_unet=double_unet, **kwargs)
     test = DataGenerator(test_img_paths,
                          test_mask_paths,
                          batch_size=batch_size,
                          img_size=img_size,
                          augmentation_p=0,
                          shuffle=False,
-                         double_unet=double_unet)
+                         double_unet=double_unet, **kwargs)
     return train, val, test

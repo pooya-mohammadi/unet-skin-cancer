@@ -1,4 +1,3 @@
-import numpy as np
 import sys
 from datetime import datetime
 from os.path import join
@@ -25,7 +24,11 @@ def train():
 
     id_ = model_name + "_" + str(datetime.now().date()) + "_" + str(datetime.now().time())
     weight_path = join('weights', id_) + ".h5"
-    mlflow_handler = MLFlowHandler(model_name=model_name, run_name=id_)
+    mlflow_handler = MLFlowHandler(model_name=model_name,
+                                   run_name=id_,
+                                   run_ngrok=args.run_ngrok,
+                                   mlflow_source=args.mlflow_source
+                                   )
     mlflow_handler.start_run(args)
 
     # adjust paths for data_loader(add user path to folder path for each dataset)
@@ -38,7 +41,11 @@ def train():
     train_loader, val_loader, test_loader = get_loader(train_path, mask_train_path,
                                                        test_path, mask_test_path,
                                                        batch_size=args.batch_size,
-                                                       model_name=model_name)
+                                                       model_name=model_name,
+                                                       cutmix_p=args.cutmix_p,
+                                                       beta=args.cutmix_beta,
+                                                       usual_aug_with_cutmix=args.usual_aug_with_cutmix,
+                                                       )
     print("Loading Data is Done!")
 
     model = load_model(model_name=model_name)

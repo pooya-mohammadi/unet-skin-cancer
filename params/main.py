@@ -29,7 +29,16 @@ def main_args():
                         help="Run ngrok for colab!")
     parser.add_argument('--no-run-ngrok', dest='run_ngrok', action='store_false',
                         help="Don't run ngrok for colab!")
-
+    # aug cut mix
+    parser.add_argument('--cutmix-p', type=float, default=0.5,
+                        help='probability to apply cutmix')
+    parser.add_argument('--cutmix-beta', type=float, default=0.5,
+                        help='beta variable of cutmix')
+    parser.add_argument('--usual-aug-with-cutmix', dest='usual_aug_with_cutmix', action='store_true',
+                        help="Apply aug while applying cutmix")
+    parser.add_argument('--not-usual-aug-with-cutmix', dest='usual_aug_with_cutmix', action='store_false',
+                        help="Don't apply aug while applying cutmix")
+    parser.set_defaults(usual_aug_with_cutmix=False)
     # Plots
     # roc curve
     parser.add_argument('--plot_roc', dest='plot_roc', action='store_true',
