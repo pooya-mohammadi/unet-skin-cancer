@@ -2,9 +2,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from .mlflow_handler import MLFlowHandler
 import random
+from utils.model_generalization import model_generalization
 
 
-def image_plot(testloader, Y_pred):
+def image_plot(testloader, y_pred):
     figures = []
     for i in range(5):
         index = random.randint(0, 379)
@@ -18,7 +19,7 @@ def image_plot(testloader, Y_pred):
         ax2.imshow(np.squeeze(testloader[1][index]))
         ax3 = f.add_subplot(333)
         ax3.set_title(f"Pred mask picture of index = {index}")
-        ax3.imshow(np.squeeze(Y_pred[index]))
+        ax3.imshow(np.squeeze(y_pred[index]))
         figures.append(f)
     return figures
 
@@ -32,10 +33,11 @@ def get_plots(model, test_loader, args, mlflow_handler: MLFlowHandler):
     print(f'Test: Loss= {test_score[0]}, Accuracy: {test_score[1]}')
     print(f'Test: Dice= {test_score[2]}, Iou: {test_score[3]}')
 
-
-
     # Metrics: Confusion Matrix
 
     figures = image_plot(test_loader, Y_pred)
     for i in range(len(figures)):
         mlflow_handler.add_figure(figures[i], f'images/rgb_test_mask_samples{i}.png')
+
+    figure = model_generalization(model, test_loader)
+    mlflow_handler.add_figure(figure, f'images/model_generalization_samples.png')
