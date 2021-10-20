@@ -1,4 +1,3 @@
-from random import random
 import numpy as np
 
 
@@ -54,10 +53,12 @@ class CutMix:
             return array_a
 
     @staticmethod
-    def apply_cutmix(beta, image_a, image_b, mask_a=None, mask_b=None, shuffle=True):
-        image_a, image_b = image_a.copy(), image_b.copy()
-        if mask_a is not None and mask_b is not None:
-            mask_a, mask_b = mask_a.copy(), mask_b.copy()
+    def seg_cutmix(beta, image_a, mask_a, image_b=None, mask_b=None, shuffle=True):
+        if image_b is None:
+            image_b = image_a
+            mask_b = mask_a
+
+        image_a, mask_a, image_b, mask_b = image_a.copy(), mask_a.copy(), image_b.copy(), mask_b.copy()
 
         if shuffle:
             CutMix.shuffle(image_a, mask_a)
@@ -65,23 +66,18 @@ class CutMix:
 
         lam = np.random.beta(beta, beta)
         boxes = CutMix.get_boxes(image_a.shape, lam)
-        x_cutmix_mask = np.ones_like(image_a)
 
+        # x_cutmix
+        x_cutmix_mask = np.ones_like(image_a)
         for i, (x1, y1, x2, y2) in enumerate(boxes):
             x_cutmix_mask[i, x1:x2, y1:y2, :] = 0
         x_cutmix = (np.multiply(image_a, x_cutmix_mask) + np.multiply(image_b, (abs(1. - x_cutmix_mask)))).astype(
             np.uint8)
-        if mask_a is not None and mask_b is not None:
-            y_cutmix_mask = np.ones_like(mask_a)
-            for i, (x1, y1, x2, y2) in enumerate(boxes):
-                y_cutmix_mask[i, x1:x2, y1:y2] = 0
-            y_cutmix = (np.multiply(mask_a, y_cutmix_mask) + np.multiply(mask_b, (abs(1. - y_cutmix_mask)))).astype(
-                np.uint8)
-            return x_cutmix, y_cutmix
-        return x_cutmix
 
-    @staticmethod
-    def get_cutmix(prob, beta, image_a, image_b, mask_a=None, mask_b=None, shuffle=True):
-        if random() < prob:
-            results = CutMix.get_cutmix(beta, image_a, image_b, mask_a, mask_b, shuffle)
-            return results
+        # y_cutmix
+        y_cutmix_mask = np.ones_like(mask_a)
+        for i, (x1, y1, x2, y2) in enumerate(boxes):
+            y_cutmix_mask[i, x1:x2, y1:y2] = 0
+        y_cutmix = (np.multiply(mask_a, y_cutmix_mask) + np.multiply(mask_b, (abs(1. - y_cutmix_mask)))).astype(
+            np.uint8)
+        return x_cutmix, y_cutmix

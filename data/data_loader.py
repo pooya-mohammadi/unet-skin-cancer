@@ -70,7 +70,7 @@ class DataGenerator(tf.keras.utils.Sequence):
                     img, mask = augmented['image'], augmented['mask']
                 x[i] = img
                 y[i] = mask
-            x, y = CutMix.apply_cutmix(self.beta, image_a=x, image_b=x, mask_a=y, mask_b=y)
+            x, y = CutMix.seg_cutmix(self.beta, image_a=x, mask_a=y)
         else:
             for i, (img_path, mask_path) in enumerate(zip(batch_img, batch_mask)):
                 img = cv2.imread(img_path)

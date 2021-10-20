@@ -32,8 +32,8 @@ def main_args():
     # aug cut mix
     parser.add_argument('--cutmix-p', type=float, default=0.5,
                         help='probability to apply cutmix')
-    parser.add_argument('--cutmix-beta', type=float, default=0.5,
-                        help='beta variable of cutmix')
+    parser.add_argument('--cutmix-beta', type=float, default=1,
+                        help='beta variable of cutmix, default value is taken from the original paper')
     parser.add_argument('--usual-aug-with-cutmix', dest='usual_aug_with_cutmix', action='store_true',
                         help="Apply aug while applying cutmix")
     parser.add_argument('--not-usual-aug-with-cutmix', dest='usual_aug_with_cutmix', action='store_false',
