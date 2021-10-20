@@ -81,3 +81,27 @@ class CutMix:
         y_cutmix = (np.multiply(mask_a, y_cutmix_mask) + np.multiply(mask_b, (abs(1. - y_cutmix_mask)))).astype(
             np.uint8)
         return x_cutmix, y_cutmix
+
+    @staticmethod
+    def cls_cutmix(beta, image_a, label_a, image_b=None, label_b=None, shuffle=True):
+        if image_b is None:
+            image_b = image_a
+            label_b = label_a
+
+        image_a, label_a, image_b, label_b = image_a.copy(), label_a.copy(), image_b.copy(), label_b.copy()
+
+        if shuffle:
+            CutMix.shuffle(image_a)
+            CutMix.shuffle(image_b)
+
+        lam = np.random.beta(beta, beta)
+        boxes = CutMix.get_boxes(image_a.shape, lam)
+
+        # img_cutmix
+        img_cutmix_mask = np.ones_like(image_a)
+        for i, (x1, y1, x2, y2) in enumerate(boxes):
+            img_cutmix_mask[i, x1:x2, y1:y2, :] = 0
+        img_cutmix = (np.multiply(image_a, img_cutmix_mask) + np.multiply(image_b, (abs(1. - img_cutmix_mask)))).astype(
+            np.uint8)
+        label_cutmix = lam * label_a + label_b * (1 - lam)
+        return img_cutmix, label_cutmix
