@@ -16,7 +16,6 @@ class MLFlowLogger(Callback):
         self.mlflow.log_metric('val acc', logs['val_acc'])
         self.mlflow.log_metric('train loss', logs['loss'])
         self.mlflow.log_metric('val_loss', logs['val_loss'])
-        self.mlflow.log_metric('lr', logs['lr'])
 
     def on_train_begin(self, logs=None):
         self.mlflow.log_param('optimizer_name', type(self.model.optimizer).__name__)
