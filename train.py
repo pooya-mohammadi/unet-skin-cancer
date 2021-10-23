@@ -22,7 +22,6 @@ def train():
     args = get_args(model_name)
     print(f"Arguments: {args}")
 
-    print("running mlflow handler....")
     id_ = model_name + "_" + str(datetime.now().date()) + "_" + str(datetime.now().time())
     weight_path = join('weights', id_) + ".h5"
     mlflow_handler = MLFlowHandler(model_name=model_name,
@@ -30,7 +29,6 @@ def train():
                                    run_ngrok=args.run_ngrok,
                                    mlflow_source=args.mlflow_source
                                    )
-    print("mlflowhandler ran successfully")
     mlflow_handler.start_run(args)
     # adjust paths for data_loader(add user path to folder path for each dataset)
     train_path = args.train_path + "/ISBI2016_ISIC_Part1_Training_Data"
