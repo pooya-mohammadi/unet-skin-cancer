@@ -12,8 +12,10 @@ class MLFlowLogger(Callback):
         self.mlflow = mlflow
 
     def on_epoch_end(self, epoch, logs=None):
-        self.mlflow.log_metric('train acc', logs['acc'])
-        self.mlflow.log_metric('val acc', logs['val_acc'])
+        self.mlflow.log_metric('train dice', logs['dice'])
+        self.mlflow.log_metric('val dice', logs['val_dice'])
+        self.mlflow.log_metric('train iou', logs['iou'])
+        self.mlflow.log_metric('val iou', logs['val_iou'])
         self.mlflow.log_metric('train loss', logs['loss'])
         self.mlflow.log_metric('val_loss', logs['val_loss'])
 
