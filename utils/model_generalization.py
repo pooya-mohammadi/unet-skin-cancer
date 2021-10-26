@@ -1,4 +1,4 @@
-from utils import combine_images
+from utils.combine_images import combine_images
 import numpy as np
 import random
 import matplotlib.pyplot as plt

@@ -30,13 +30,11 @@ def train():
                                    mlflow_source=args.mlflow_source
                                    )
     mlflow_handler.start_run(args)
-
     # adjust paths for data_loader(add user path to folder path for each dataset)
     train_path = args.train_path + "/ISBI2016_ISIC_Part1_Training_Data"
     mask_train_path = args.mask_train_path + "/ISBI2016_ISIC_Part1_Training_GroundTruth"
     test_path = args.test_path + "/ISBI2016_ISIC_Part1_Test_Data"
     mask_test_path = args.mask_test_path + "/ISBI2016_ISIC_Part1_Test_GroundTruth"
-
     # Loading model
     train_loader, val_loader, test_loader = get_loader(train_path, mask_train_path,
                                                        test_path, mask_test_path,
@@ -52,7 +50,7 @@ def train():
     print("Loading Model is Done!")
     # training
 
-    Modelcheckpoint, _, _, estop_callback, lr_callback = get_callbacks(model_path=weight_path,
+    modelcheckpoint, _, _, estop_callback, lr_callback = get_callbacks(model_path=weight_path,
                                                                        early_stopping_p=5,
                                                                        mlflow=mlflow,
                                                                        args=args)
@@ -65,14 +63,14 @@ def train():
     else:
         raise Exception()
     model.compile(optimizer=Adam(learning_rate=args.lr), loss=loss,
-                  metrics=['accuracy', dice, iou])
+                  metrics=['acc', dice, iou])
 
     print("Training ....")
     model.fit(train_loader,
               batch_size=args.batch_size
               , epochs=args.epochs,
               validation_data=val_loader,
-              callbacks=[estop_callback, Modelcheckpoint, mlflow_handler.mlflow_logger])
+              callbacks=[estop_callback, modelcheckpoint, mlflow_handler.mlflow_logger])
     print("Training is done")
     get_plots(model, test_loader, args, mlflow_handler)
     mlflow_handler.end_run(weight_path)
