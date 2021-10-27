@@ -50,7 +50,7 @@ def train():
     print("Loading Model is Done!")
     # training
 
-    modelcheckpoint, _, _, estop_callback, lr_callback = get_callbacks(model_path=weight_path,
+    modelcheckpoint, lr_callback, _, estop_callback, _ = get_callbacks(model_path=weight_path,
                                                                        early_stopping_p=5,
                                                                        mlflow=mlflow,
                                                                        args=args)
@@ -70,8 +70,10 @@ def train():
               batch_size=args.batch_size
               , epochs=args.epochs,
               validation_data=val_loader,
-              callbacks=[estop_callback, modelcheckpoint, mlflow_handler.mlflow_logger])
+              callbacks=[lr_callback, estop_callback, modelcheckpoint, mlflow_handler.mlflow_logger])
     print("Training is done")
+    # Loading checkpoint model
+    model.load_weights(weight_path)
     get_plots(model, test_loader, args, mlflow_handler)
     mlflow_handler.end_run(weight_path)
 

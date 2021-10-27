@@ -154,12 +154,18 @@ def get_loader(train_input_dir,
                         batch_size=batch_size,
                         img_size=img_size,
                         augmentation_p=0.5,
-                        double_unet=double_unet, **kwargs)
+                        double_unet=double_unet,
+                        cutmix_p=0,
+                        beta=1,
+                        usual_aug_with_cutmix=False)
     test = DataGenerator(test_img_paths,
                          test_mask_paths,
                          batch_size=batch_size,
                          img_size=img_size,
                          augmentation_p=0,
                          shuffle=False,
-                         double_unet=double_unet, **kwargs)
+                         double_unet=double_unet,
+                         cutmix_p=0,
+                         beta=1,
+                         usual_aug_with_cutmix=False)
     return train, val, test
