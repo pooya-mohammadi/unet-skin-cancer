@@ -1,9 +1,9 @@
 from argparse import ArgumentParser
 
 
-def r2unet_args():
+def r2unet_cbam_args():
     parser = ArgumentParser()
-    parser.add_argument('--model', type=str, default='unet_attention_gate', help='Set it unet_attention_gate')
+    parser.add_argument('--model', type=str, default='unet_attention_gate', help='Set it r2unet_cbam')
     parser.add_argument('--epochs', type=int, default= 20, help='define number of training epochs')
     parser.add_argument('--batch_size', type=int, default=8, help='define size of each batch')
     parser.add_argument('--lr', type=int, default=0.001, help='define learning_rate parameter')
