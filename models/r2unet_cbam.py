@@ -110,7 +110,7 @@ def r2_unet_2d_base(input_tensor, filter_num, stack_num_down=2, stack_num_up=2, 
 
     return X
 
-class R2Unet:
+class R2Unet_CBAM:
     def __init__(self, input_size=(256,256,3), filter_num=[64, 128, 256, 512], n_labels=1, 
                 stack_num_down=2, stack_num_up=2, recur_num=2,
                 activation='ReLU', output_activation='Sigmoid', 
