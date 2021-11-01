@@ -6,6 +6,8 @@ from .unet_cbam import CbamUnet
 from .unet_cbam_gate import Cbam_Gate_Unet
 from .unet_pyramid_cbam_gate import Pyramid_Cbam_Gate_Unet
 from .mcgu_net import MCGUNET
+from .r2unet import R2Unet
+from .r2unet_cbam import R2Unet_CBAM
 
 MODELS = dict(unet_res50=UnetRes50,
               unet_conv_deconv=UnetConvDeconv,
@@ -14,7 +16,9 @@ MODELS = dict(unet_res50=UnetRes50,
               unet_cbam=CbamUnet,
               unet_cbam_gate=Cbam_Gate_Unet,
               unet_pyramid_cbam_gate=Pyramid_Cbam_Gate_Unet,
-              mcg_unet=MCGUNET
+              mcg_unet=MCGUNET,
+              r2unet=R2Unet,
+              R2Unet_CBAM=R2Unet_CBAM
               # other models
               )
 
