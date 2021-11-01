@@ -5,6 +5,7 @@ from .unet_attention_gate import unetgate_args
 from .unet_cbam import unetcbam_args
 from .unet_cbam_gate import unetcbamgate_args
 from .unet_pyramid_cbam_gate import unetcbamgate_pyramid_args
+from .mcgu_net import mcgUnet_args
 from .r2unet_cbam import r2unet_cbam_args
 
 ARGUMENTS = dict(unet_res50=unetRes50_args,
@@ -14,6 +15,7 @@ ARGUMENTS = dict(unet_res50=unetRes50_args,
                  unet_cbam=unetcbam_args,
                  unet_cbam_gate=unetcbamgate_args,
                  unet_pyramid_cbam_gate=unetcbamgate_pyramid_args,
+                 mcg_unet=mcgUnet_args
                  r2unet_cbam=r2unet_cbam_args
                  # other models
                  )

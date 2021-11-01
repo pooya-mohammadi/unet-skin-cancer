@@ -7,6 +7,7 @@ import numpy as np
 import albumentations as A
 import tensorflow as tf
 from utils.cutmix_augmentation import CutMix
+from utils.mozaic import mosaic_aug
 
 
 class DataGenerator(tf.keras.utils.Sequence):
@@ -22,9 +23,10 @@ class DataGenerator(tf.keras.utils.Sequence):
                  shuffle=True,
                  double_unet=False,
                  p_random_rotate_90=0.5,
-                 p_horizontal_flip=0.5,
+                 p_horizontal_flip=1,
                  p_vertical_flip=0.5,
-                 p_center_crop=0.1,
+                 p_center_crop=0.9,
+                 p_mosaic=0.25
                  ):
         self.img_paths = np.array(img_list)
         self.mask_paths = np.array(mask_list)
@@ -42,6 +44,7 @@ class DataGenerator(tf.keras.utils.Sequence):
         self.img_size = img_size
         self.img_channel = img_channel
         self.cutmix_p = cutmix_p
+        self.p_mosaic = p_mosaic
         self.beta = beta
         self.on_epoch_end()
 
@@ -66,6 +69,7 @@ class DataGenerator(tf.keras.utils.Sequence):
                 img = cv2.resize(img, self.img_size)
                 mask = cv2.resize(mask, self.img_size, interpolation=cv2.INTER_NEAREST)
                 if self.usual_aug_with_cutmix:
+                    img, mask = mosaic_aug(img, mask, self.img_paths, self.mask_paths, self.img_size, p=self.p_mosaic)
                     augmented = self.transform(image=img, mask=mask)
                     img, mask = augmented['image'], augmented['mask']
                 x[i] = img
@@ -77,6 +81,7 @@ class DataGenerator(tf.keras.utils.Sequence):
                 mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
                 img = cv2.resize(img, self.img_size)
                 mask = cv2.resize(mask, self.img_size, interpolation=cv2.INTER_NEAREST)
+                img, mask = mosaic_aug(img, mask, self.img_paths, self.mask_paths, self.img_size, p=self.p_mosaic)
                 augmented = self.transform(image=img, mask=mask)
                 x[i] = augmented['image']
                 y[i] = augmented['mask']
@@ -91,8 +96,8 @@ def get_loader(train_input_dir,
                test_input_dir,
                test_mask_dir,
                model_name,
-               val_size=0.1,
-               batch_size=32,
+               val_size=0.2,
+               batch_size=8,
                img_size=(256, 256),
                **kwargs):
     # should there be only one direction?
@@ -113,10 +118,15 @@ def get_loader(train_input_dir,
             if fname.endswith(".png")
         ]
     )
+
+
     train_img_paths, val_img_paths, train_mask_paths, val_mask_paths = train_test_split(train_img_paths,
                                                                                         train_mask_paths,
                                                                                         test_size=val_size,
                                                                                         shuffle=True)
+    train_img_paths = train_img_paths + train_img_paths
+    train_mask_paths = train_mask_paths + train_mask_paths
+
     test_img_paths = sorted(
         [
             os.path.join(test_input_dir, fname)
@@ -144,12 +154,18 @@ def get_loader(train_input_dir,
                         batch_size=batch_size,
                         img_size=img_size,
                         augmentation_p=0.5,
-                        double_unet=double_unet, **kwargs)
+                        double_unet=double_unet,
+                        cutmix_p=0,
+                        beta=1,
+                        usual_aug_with_cutmix=False)
     test = DataGenerator(test_img_paths,
                          test_mask_paths,
                          batch_size=batch_size,
                          img_size=img_size,
                          augmentation_p=0,
                          shuffle=False,
-                         double_unet=double_unet, **kwargs)
+                         double_unet=double_unet,
+                         cutmix_p=0,
+                         beta=1,
+                         usual_aug_with_cutmix=False)
     return train, val, test
