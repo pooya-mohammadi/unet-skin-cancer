@@ -24,7 +24,7 @@ class MLFlowLogger(Callback):
 
 
 class MLFlowHandler:
-    def __init__(self, model_name, run_name, mlflow_source='./mlruns', run_ngrok=True):
+    def __init__(self, model_name, run_name, mlflow_source, run_ngrok):
         self.mlflow = mlflow
         self.run_ngrok = run_ngrok
         self.mlflow_source = mlflow_source

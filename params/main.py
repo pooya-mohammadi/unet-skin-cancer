@@ -25,10 +25,11 @@ def main_args():
     # ngrok
     parser.add_argument('--mlflow-source', type=str, default='./mlruns',
                         help='The mlflow direcotry')
-    parser.add_argument('--run-ngrok', dest='run_ngrok', default=True, action='store_true',
+    parser.add_argument('--ngrok', dest='ngrok', action='store_true',
                         help="Run ngrok for colab!")
-    parser.add_argument('--no-run-ngrok', dest='run_ngrok', action='store_false',
+    parser.add_argument('--no-ngrok', dest='ngrok', action='store_false',
                         help="Don't run ngrok for colab!")
+    parser.set_defaults(ngrok=False)
     # aug cut mix
     parser.add_argument('--cutmix-p', type=float, default=0.5,
                         help='probability to apply cutmix')

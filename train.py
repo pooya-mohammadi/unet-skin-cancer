@@ -26,7 +26,7 @@ def train():
     weight_path = join('weights', id_) + ".h5"
     mlflow_handler = MLFlowHandler(model_name=model_name,
                                    run_name=id_,
-                                   run_ngrok=args.run_ngrok,
+                                   run_ngrok=args.ngrok,
                                    mlflow_source=args.mlflow_source
                                    )
     mlflow_handler.start_run(args)
