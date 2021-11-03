@@ -1,22 +1,37 @@
+import os.path
+
 from deep_utils import download_file
 from argparse import *
+import shutil
 
 
 def preprocessing(DATASET_NAME,
                   train_zip, test_zip, mask_train_zip, train_path, test_path, mask_train_path,
                   mask_test_zip=None, mask_test_path=None, val_zip=None, val_path=None, mask_val_zip=None,
                   mask_val_path=None):
-    download_file(url=train_zip, file_path=train_path, unzip=True)
-    download_file(url=mask_train_zip, file_path=mask_train_path, unzip=True)
+    download_rename(train_zip, train_path)
+    download_rename(mask_train_zip, mask_train_path)
 
     if DATASET_NAME == "ISIC_2016":
-        download_file(url=test_zip, file_path=test_path, unzip=True)
-        download_file(url=mask_test_zip, file_path=mask_test_path, unzip=True)
+        download_rename(test_zip, test_path)
+        download_rename(mask_test_zip, mask_test_path)
 
     elif DATASET_NAME == "ISIC_2018":
-        download_file(url=val_zip, file_path=val_path, unzip=True)
-        download_file(url=mask_val_zip, file_path=mask_val_path, unzip=True)
+        download_rename(val_zip, val_path)
+        download_rename(mask_val_zip, mask_val_path)
     print("Preprocessing is done")
+
+
+def download_rename(train_zip, train_path):
+    download_url = '.'
+    file_name = train_zip.split("/")[-1][:-4]
+    if not os.path.exists(file_name):
+        download_file(url=train_zip, download_dir=download_url, unzip=True, remove_zip=True)
+    else:
+        print('file exists')
+    if os.path.exists(train_path):
+        shutil.rmtree(train_path)
+    shutil.move(download_url + "/" + file_name, train_path)
 
 
 if __name__ == "__main__":
@@ -38,8 +53,8 @@ if __name__ == "__main__":
                             default="https://isic-challenge-data.s3.amazonaws.com/2016/ISBI2016_ISIC_Part1_Test_GroundTruth.zip")
         parser.add_argument("--train_path", default="./train")
         parser.add_argument("--test_path", default="./test")
-        parser.add_argument("--mask_train_path", default="./masktrain")
-        parser.add_argument("--mask_test_path", default="./masktest")
+        parser.add_argument("--mask_train_path", default="./mask_train")
+        parser.add_argument("--mask_test_path", default="./mask_test")
 
         args = parser.parse_args()
         preprocessing(args.DATASET_NAME,
@@ -56,12 +71,12 @@ if __name__ == "__main__":
         parser.add_argument("--mask_train_zip_url",
                             default="https://isic-challenge-data.s3.amazonaws.com/2018/ISIC2018_Task1_Training_GroundTruth.zip")
         parser.add_argument("--mask_val_zip_url",
-                            default="https://isic-challenge-data.s3.amazonaws.com/2018/ISIC2018_Task2_Validation_GroundTruth.zip")
+                            default="https://isic-challenge-data.s3.amazonaws.com/2018/ISIC2018_Task1_Validation_GroundTruth.zip")
         parser.add_argument("--train_path", default="./train")
         parser.add_argument("--test_path", default="./test")
         parser.add_argument("--val_path", default="./val")
-        parser.add_argument("--mask_train_path", default="./masktrain")
-        parser.add_argument("--mask_val_path", default="./maskval")
+        parser.add_argument("--mask_train_path", default="./mask_train")
+        parser.add_argument("--mask_val_path", default="./mask_val")
 
         args = parser.parse_args()
         preprocessing(args.DATASET_NAME,

@@ -64,7 +64,7 @@ def mosaic_aug(x: np.ndarray, y: np.ndarray,
     """
 
     flag = random.random()
-    if (p > flag):
+    if p > flag:
         img1_idx = random.randint(0, len(img_paths) - 1)
         img2_idx = random.randint(0, len(img_paths) - 1)
         img3_idx = random.randint(0, len(img_paths) - 1)
