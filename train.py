@@ -31,10 +31,10 @@ def train():
                                    )
     mlflow_handler.start_run(args)
     # adjust paths for data_loader(add user path to folder path for each dataset)
-    train_path = args.train_path + "/ISBI2016_ISIC_Part1_Training_Data"
-    mask_train_path = args.mask_train_path + "/ISBI2016_ISIC_Part1_Training_GroundTruth"
-    test_path = args.test_path + "/ISBI2016_ISIC_Part1_Test_Data"
-    mask_test_path = args.mask_test_path + "/ISBI2016_ISIC_Part1_Test_GroundTruth"
+    train_path = args.train_path
+    mask_train_path = args.mask_train_path
+    test_path = args.test_path
+    mask_test_path = args.mask_test_path
     # Loading model
     train_loader, val_loader, test_loader = get_loader(train_path, mask_train_path,
                                                        test_path, mask_test_path,
@@ -43,6 +43,14 @@ def train():
                                                        cutmix_p=args.cutmix_p,
                                                        beta=args.cutmix_beta,
                                                        usual_aug_with_cutmix=args.usual_aug_with_cutmix,
+                                                       hair_aug_p=args.hair_aug_p,
+                                                       hair_rmv_p=args.hair_rmv_p,
+                                                       img_channel=args.img_channel,
+                                                       p_random_rotate_90=args.p_random_rotate_90,
+                                                       p_horizontal_flip=args.p_horizontal_flip,
+                                                       p_vertical_flip=args.p_vertical_flip,
+                                                       p_center_crop=args.p_center_crop,
+                                                       p_mosaic=args.mosaic_p
                                                        )
     print("Loading Data is Done!")
 

@@ -8,6 +8,7 @@ def main_args():
     parser.add_argument('--optimizer', type=str, default='adam',
                         help='Choose the training optimizer. Default = adam')
     parser.add_argument('--batch-size', type=int, default=8, help='define size of each batch')
+    parser.add_argument('--img-channel', type=int, default=3, help='number of channels image has')
     parser.add_argument('--transfer_learning_epochs', type=int, default=5,
                         help='Define the number of transfer learning epochs. Default = 5')
     parser.add_argument('--finetuning_epochs', type=int, default=10,
@@ -30,6 +31,7 @@ def main_args():
     parser.add_argument('--no-ngrok', dest='ngrok', action='store_false',
                         help="Don't run ngrok for colab!")
     parser.set_defaults(ngrok=False)
+
     # aug cut mix
     parser.add_argument('--cutmix-p', type=float, default=0.5,
                         help='probability to apply cutmix')
@@ -41,6 +43,23 @@ def main_args():
                         help="Don't apply aug while applying cutmix")
     parser.set_defaults(usual_aug_with_cutmix=False)
     # Plots
+
+    # augmentation
+    parser.add_argument('--hair-aug-p', type=float, default=0.5,
+                        help='probability to apply hair augmentation')
+    parser.add_argument('--hair-rmv-p', dest='hair_rmv_p', default=0.1,
+                        help='probability to apply hair augmentation')
+    parser.add_argument('--p_random_rotate_90', type=float, default=0.5,
+                        help='probability to apply p_random_rotate_90')
+    parser.add_argument('--p_horizontal_flip', type=float, default=0.5,
+                        help='probability to apply p_horizontal_flip')
+    parser.add_argument('--p_vertical_flip', type=float, default=0.5,
+                        help='probability to apply p_vertical_flip')
+    parser.add_argument('--p_center_crop', type=float, default=0.5,
+                        help='probability to apply p_center_crop')
+    parser.add_argument('--mosaic_p', type=float, default=0.5,
+                        help='probability to apply mosaic_p')
+
     # roc curve
     parser.add_argument('--plot_roc', dest='plot_roc', action='store_true',
                         help="Plot the roc curve.")
@@ -69,8 +88,10 @@ def main_args():
     # Arguments of path directions in dataloader
     parser.add_argument("--train_path", default="data/train", help='define train path images')
     parser.add_argument("--test_path", default="data/test", help='define test path images')
-    parser.add_argument("--mask_train_path", default="data/masktrain", help='define mask of train path images')
-    parser.add_argument("--mask_test_path", default="data/masktest", help='define mask of test path images')
+    parser.add_argument("--mask_train_path", default="data/mask_train", help='define mask of train path images')
+    parser.add_argument("--mask_test_path", default="data/mask_test", help='define mask of test path images')
+    parser.add_argument("--val_path", default="data/val", help='define mask of train path images')
+    parser.add_argument("--mask_val_path", default="data/mask_val", help='define mask of test path images')
 
     # Other options
     parser.add_argument('--verbose', type=int, default=1,
