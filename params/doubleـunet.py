@@ -1,10 +1,12 @@
-from argparse import ArgumentParser
 from .main import main_args
 
 
-def unetConvDeconv_args():
+def doubleunet_args():
     parser = main_args()
-    parser.add_argument('--model', type=str, default='unet_conv_deconv', help='model name. Set it unet_conv_deconv')
+    parser.add_argument('--model', type=str, default='double_unet', help='model name. Set it double_unet')
+
+    # parser.add_argument('--loss', default="dice_loss", help='define loss function of model')
+
     # Arguments for Augmentation in dataloader
     parser.add_argument("--rotation_range", type=float, default=0.5, help='Range of rotation of images')
     parser.add_argument("--horizontal_flip", type=float, default=1.0, help='Whether flip horizontally or not')

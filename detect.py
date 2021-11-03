@@ -1,7 +1,8 @@
+import cv2
+
 from models import load_model
 from PIL import Image
 import numpy as np
-import tensorflow as tf
 from utils.utils import get_gpu_grower
 
 get_gpu_grower()
@@ -15,14 +16,12 @@ class Detect:
     def detect(self, img):
         # apply necessary preprocessing
         img = np.array(img)
-        img_s = (np.array(img.shape) >> 4) << 4
-        img = img[np.newaxis, :img_s[0], :img_s[1], :]
-        img = Image.fromarray(img).convert("RGB")
-        img = np.array(img, dtype=np.float32) / 255.
+        img = cv2.resize(img, (256, 256))
+        img = np.expand_dims(img, axis=0)
 
         # predict
         result = self.model.predict(img)
-
+        # result = result.astype(np.uint8)[0]
         # apply necessary post-processing
         result = np.array(result * 255, dtype=np.uint8).squeeze()
 
@@ -36,7 +35,11 @@ class Detect:
 
 
 if __name__ == '__main__':
-    detect = Detect('unet', './weights/unet')
+    import matplotlib.pyplot as plt
+
+    detect = Detect('unet_res50', './weights/unet_res50/unet_model.h5')
     results = detect.detect_from_path(
-        img_path='./streamlit/files/random-images/0a7d30b252359a10fd298b638b90cb9ada3acced4e0c0e5a3692013f432ee4e9.png')
+        img_path='./streamlit/files/random-images/ISIC_0010465.jpg')
+    plt.imshow(results)
+    plt.show()
     print(results)
