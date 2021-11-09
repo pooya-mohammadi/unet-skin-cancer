@@ -8,7 +8,7 @@ import albumentations as A
 import tensorflow as tf
 from utils.cutmix_augmentation import CutMix
 from utils.mosaic import mosaic_aug
-from utils.hair_augmentation import HairAugmentation, HairRemoval
+from utils.hair_augmentation import HairAugmentation, HairRemoval, Identity
 
 
 class DataGenerator(tf.keras.utils.Sequence):
@@ -43,7 +43,9 @@ class DataGenerator(tf.keras.utils.Sequence):
             A.VerticalFlip(p=p_vertical_flip),
             A.HorizontalFlip(p=p_horizontal_flip),
             A.CenterCrop(p=p_center_crop, height=img_size[1], width=img_size[0]),
-            A.OneOf([HairAugmentation(p=hair_aug_p), HairRemoval(p=hair_rmv_p)], p=0.5),
+            A.OneOf(
+                [HairAugmentation(p=hair_aug_p), HairRemoval(p=hair_rmv_p),
+                 Identity(p=1 if hair_aug_p == 0 and hair_rmv_p == 0 else 0)], p=0.5),
         ], p=augmentation_p)
         self.img_size = img_size
         self.img_channel = img_channel

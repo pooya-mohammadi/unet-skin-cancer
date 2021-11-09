@@ -89,3 +89,11 @@ class HairRemoval(A.ImageOnlyTransform):
         ret, thresh2 = cv2.threshold(black_hat, 10, 255, cv2.THRESH_BINARY)
         dst = cv2.inpaint(src, thresh2, 1, cv2.INPAINT_TELEA)
         return dst
+
+
+class Identity(A.ImageOnlyTransform):
+    def __init__(self, p: float = 0.5):
+        super().__init__(p=p)
+
+    def apply(self, img, **params):
+        return img
