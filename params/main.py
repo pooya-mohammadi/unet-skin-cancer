@@ -45,9 +45,10 @@ def main_args():
     # Plots
 
     # augmentation
-    parser.add_argument('--hair-aug-p', type=float, default=0.5,
+    parser.add_argument('--hair-aug-p', type=float, default=1,
                         help='probability to apply hair augmentation')
-    parser.add_argument('--hair-rmv-p', dest='hair_rmv_p', default=0.1,
+    parser.add_argument('--hair-rmv-p', dest='hair_rmv_p',
+                        type=float, default=0,
                         help='probability to apply hair augmentation')
     parser.add_argument('--p_random_rotate_90', type=float, default=0.5,
                         help='probability to apply p_random_rotate_90')
