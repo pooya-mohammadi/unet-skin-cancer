@@ -4,6 +4,7 @@ from models import load_model
 from PIL import Image
 import numpy as np
 from utils.utils import get_gpu_grower
+import matplotlib.pyplot as plt
 
 get_gpu_grower()
 
@@ -16,14 +17,16 @@ class Detect:
     def detect(self, img):
         # apply necessary preprocessing
         img = np.array(img)
+        org_shape = img.shape
         img = cv2.resize(img, (256, 256))
         img = np.expand_dims(img, axis=0)
-
+        img = img/255
         # predict
         result = self.model.predict(img)
-        # result = result.astype(np.uint8)[0]
-        # apply necessary post-processing
-        result = np.array(result * 255, dtype=np.uint8).squeeze()
+        result = cv2.resize(result.squeeze(), org_shape[:2][::-1])
+        result = np.array(result * 255, dtype=np.uint8)
+        print("max", np.max(result))
+
 
         # return the results
         return result
@@ -36,10 +39,9 @@ class Detect:
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
-
     detect = Detect('unet_res50', './weights/unet_res50/unet_model.h5')
     results = detect.detect_from_path(
-        img_path='./streamlit/files/random-images/ISIC_0010465.jpg')
+        img_path='./data/test/ISBI2016_ISIC_Part1_Test_Data/ISIC_0000012.jpg')
     plt.imshow(results)
     plt.show()
     print(results)
