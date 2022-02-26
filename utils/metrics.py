@@ -9,7 +9,7 @@ def iou(y_true, y_pred):
     return intersection / union
 
 
-def dice(y_true, y_pred):
+def dice_score(y_true, y_pred):
     smooth = 1.
     y_true_f = K.flatten(y_true)
     y_pred_f = K.flatten(y_pred)

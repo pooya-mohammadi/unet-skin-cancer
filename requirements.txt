@@ -1,0 +1,5 @@
+deep_utils>=0.8.20
+tensorflow>=2.8.0
+keras_unet_collection>=0.1.13
+mlflow>=1.23.1
+albumentations>=1.1.0

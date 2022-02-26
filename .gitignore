@@ -17,6 +17,8 @@ mlruns
 /data/masktrain
 /data/test
 /data/train
+/data/mask_trian
+/data/mask_test
 # Created by https://www.toptal.com/developers/gitignore/api/python,pycharm,jupyternotebooks
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,pycharm,jupyternotebooks
 
@@ -324,3 +326,4 @@ gradleBuild
 Podfile.lock
 Pods
 xcuserdata
+/data/mask_train/

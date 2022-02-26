@@ -39,7 +39,7 @@ class Detect:
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
-    detect = Detect('unet_res50', './weights/unet_res50/unet_model.h5')
+    detect = Detect('unet_res50', 'saved_models/unet_res50/unet_model.h5')
     results = detect.detect_from_path(
         img_path='./data/test/ISBI2016_ISIC_Part1_Test_Data/ISIC_0000012.jpg')
     plt.imshow(results)

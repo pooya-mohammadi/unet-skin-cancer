@@ -63,7 +63,7 @@ def decoder1(inputs, skip_connections):
 # def encoder2(inputs):
 #     skip_connections = []
 #
-#     output = DenseNet121(include_top=False, weights='imagenet')(inputs)
+#     output = DenseNet121(include_top=False, saved_models='imagenet')(inputs)
 #     model = tf.keras.models.Model(inputs, output)
 #
 #     names = ["input_2", "conv1/relu", "pool2_conv", "pool3_conv"]

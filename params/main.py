@@ -7,51 +7,58 @@ def main_args():
     # Training
     parser.add_argument('--optimizer', type=str, default='adam',
                         help='Choose the training optimizer. Default = adam')
-    parser.add_argument('--batch-size', type=int, default=8, help='define size of each batch')
-    parser.add_argument('--img-channel', type=int, default=3, help='number of channels image has')
+    parser.add_argument('--batch_size', type=int, default=8, help='define size of each batch')
+    parser.add_argument('--img_channel', type=int, default=3, help='number of channels image has')
     parser.add_argument('--transfer_learning_epochs', type=int, default=5,
                         help='Define the number of transfer learning epochs. Default = 5')
     parser.add_argument('--finetuning_epochs', type=int, default=10,
                         help='Define the number of fine tuning epochs. Default = 10')
     parser.add_argument('--epochs', type=int, default=10,
                         help='Define the number of training epochs. Default = 10')
+
     # learning rate reduce on plateau
     parser.add_argument('--lr', type=float, default=0.001,
                         help=' learning rate. Default is 0.001')
     parser.add_argument('--min_lr', type=float, default=0.001,
                         help='min_lr learning rate. Default is 0.001')
-    parser.add_argument('--lr_patience', type=int, default=10,
-                        help='Patience in learning rate schedule. Default is 10')
 
-    # ngrok
-    parser.add_argument('--mlflow-source', type=str, default='./mlruns',
-                        help='The mlflow direcotry')
-    parser.add_argument('--ngrok', dest='ngrok', action='store_true',
-                        help="Run ngrok for colab!")
-    parser.add_argument('--no-ngrok', dest='ngrok', action='store_false',
-                        help="Don't run ngrok for colab!")
-    parser.set_defaults(ngrok=False)
+    # Callbacks
+    parser.add_argument('--reduce_lr_patience', type=int, default=5,
+                        help='Patience in learning rate schedule. Default is 5')
+    parser.add_argument('--reduce_lr_factor', type=float, default=0.1,
+                        help='reduce lr factor. Default is 0.1')
+    parser.add_argument('--early_stopping_p', type=int, default=5,
+                        help='Patience for early stopping. Default is 5'
+                        )
+
+    # mlflow
+    parser.add_argument('--mlflow-source', type=str, default='./mlruns', help='The mlflow directory')
+    # parser.add_argument('--ngrok', dest='ngrok', action='store_true',
+    #                     help="Run ngrok for colab!")
+    # parser.add_argument('--no-ngrok', dest='ngrok', action='store_false',
+    #                     help="Don't run ngrok for colab!")
+    # parser.set_defaults(ngrok=False)
 
     # aug cut mix
-    parser.add_argument('--cutmix-p', type=float, default=0.5,
+    parser.add_argument('--cutmix_p', type=float, default=0.5,
                         help='probability to apply cutmix')
-    parser.add_argument('--cutmix-beta', type=float, default=1,
+    parser.add_argument('--cutmix_beta', type=float, default=1,
                         help='beta variable of cutmix, default value is taken from the original paper')
-    parser.add_argument('--usual-aug-with-cutmix', dest='usual_aug_with_cutmix', action='store_true',
+
+    parser.add_argument('--usual_aug_with_cutmix', dest='usual_aug_with_cutmix', action='store_true',
                         help="Apply aug while applying cutmix")
-    parser.add_argument('--not-usual-aug-with-cutmix', dest='usual_aug_with_cutmix', action='store_false',
+    parser.add_argument('--not_usual_aug_with_cutmix', dest='usual_aug_with_cutmix', action='store_false',
                         help="Don't apply aug while applying cutmix")
     parser.set_defaults(usual_aug_with_cutmix=False)
     # Plots
 
     # augmentation
-    parser.add_argument('--hair-aug-p', type=float, default=1,
+    parser.add_argument('--hair_aug_p', type=float, default=1,
                         help='probability to apply hair augmentation')
-    parser.add_argument('--hair-rmv-p', dest='hair_rmv_p',
-                        type=float, default=0,
+    parser.add_argument('--hair_rmv_p', dest='hair_rmv_p', type=float, default=0,
                         help='probability to apply hair augmentation')
-    parser.add_argument('--p_random_rotate_90', type=float, default=0.5,
-                        help='probability to apply p_random_rotate_90')
+    parser.add_argument('--random_rotate_p', type=float, default=0.5,
+                        help='probability to apply random rotate')
     parser.add_argument('--p_horizontal_flip', type=float, default=0.5,
                         help='probability to apply p_horizontal_flip')
     parser.add_argument('--p_vertical_flip', type=float, default=0.5,
@@ -61,19 +68,6 @@ def main_args():
     parser.add_argument('--mosaic_p', type=float, default=0.5,
                         help='probability to apply mosaic_p')
 
-    # roc curve
-    parser.add_argument('--plot_roc', dest='plot_roc', action='store_true',
-                        help="Plot the roc curve.")
-    parser.add_argument('--no-plot_roc', dest='plot_roc', action='store_false',
-                        help="Don't plot the roc curve.")
-    parser.set_defaults(plot_roc=True)
-    # precision-recall curve
-    parser.add_argument('--plot_pr', dest='plot_pr', action='store_true',
-                        help="Plot the precision-recall curve.")
-    parser.add_argument('--no-plot_pr', dest='plot_pr', action='store_false',
-                        help="Don't plot the precision-recall curve.")
-    parser.set_defaults(plot_pr=True)
-
     # Loss Function
     parser.add_argument('--loss', type=str, default='dice_loss',
                         help='Choose between binary_crossentropy and binary_focal_loss.')
@@ -82,9 +76,9 @@ def main_args():
     parser.add_argument('--focal_loss_gamma', type=float, default=2,
                         help='Define the value for gamma parameter in focal loss.')
     parser.add_argument('--pos_weight', type=float, default=1,
-                        help='Define the value of the weight for the positive class.')
+                        help='Define the value of the weight for the positive class. Default 1')
     parser.add_argument('--neg_weight', type=float, default=1,
-                        help='Define the value of the weight for the negative class.')
+                        help='Define the value of the weight for the negative class. Default 1')
 
     # Arguments of path directions in dataloader
     parser.add_argument("--train_path", default="data/train", help='define train path images')
@@ -97,5 +91,11 @@ def main_args():
     # Other options
     parser.add_argument('--verbose', type=int, default=1,
                         help='Choose verbosity mode. 0 = silent, 1 = progress bar, 2 = one line per epoch. Default = 1')
-
+    parser.add_argument('--save_path', type=str, default='saved_models',
+                        help="path to save model directory, default = saved_models")
+    parser.add_argument("--dataset_name", type=str, default='ISIC_2016', help="dataset name, default=ISIC_2016")
+    parser.add_argument("--seed", type=int, default=1234, help="This is seed! default is 1234")
+    parser.add_argument("--img_size", type=tuple, default=(256, 256), help="img-size, default is (512, 512)")
+    parser.add_argument('--save_path_name', type=str, default='',
+                        help="specific name for saving models, default is None")
     return parser

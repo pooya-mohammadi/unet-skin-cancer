@@ -1,3 +1,5 @@
+from deep_utils import log_print
+
 from utils.combine_images import combine_images
 import numpy as np
 import random
@@ -6,10 +8,10 @@ import tensorflow
 from data.data_loader import DataGenerator
 
 
-def model_generalization(model: tensorflow.keras.models, test_loader: DataGenerator) -> plt.figure:
+def model_generalization(model: tensorflow.keras.models, test_loader: DataGenerator, logger=None) -> plt.figure:
     """
     Explanation:
-    This function get testloader and generates 4 images then put thm in one frame image
+    This function gets testloader and generates 4 images then put thm in one frame image
     then load model evaluate model on this image predict output and return related images
     """
 
@@ -19,6 +21,7 @@ def model_generalization(model: tensorflow.keras.models, test_loader: DataGenera
     ----------
     model
     test_loader
+    logger: a logger object
 
     Returns
     -------
@@ -37,7 +40,7 @@ def model_generalization(model: tensorflow.keras.models, test_loader: DataGenera
     i = random.randint(1, len(test_loader))
     for x, y in test_loader:
         i = i - 1
-        if (i == 0):
+        if i == 0:
             x_img1, y_img1 = x[0], y[0]
             x_img2, y_img2 = x[1], y[1]
             x_img3, y_img3 = x[2], y[2]
@@ -48,6 +51,7 @@ def model_generalization(model: tensorflow.keras.models, test_loader: DataGenera
     new_frame_x = np.expand_dims(new_frame_x, axis=0)
     new_frame_y = np.expand_dims(new_frame_y, axis=[0, 3])
     model.evaluate(x=new_frame_x, y=new_frame_y)
+    log_print(logger, "predicting for plots!")
     y_predict = model.predict(new_frame_x)
 
     plt.subplots_adjust(left=0.1, bottom=0.1, right=0.9, top=0.9, wspace=0.9, hspace=0.9)

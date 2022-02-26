@@ -1,3 +1,5 @@
+from deep_utils import log_print
+
 from .unet_res50 import UnetRes50
 from .unet_conv_deconv import UnetConvDeconv
 from .unet_attention_gate import GateUnet
@@ -19,10 +21,11 @@ MODELS = dict(unet_res50=UnetRes50,
               mcg_unet=MCGUNET,
               r2unet=R2Unet,
               R2Unet_CBAM=R2Unet_CBAM
-              # other models
               )
 
 
-def load_model(model_name, **kwargs):
+def load_model(model_name, logger=None, **kwargs):
     """Get models"""
-    return MODELS[model_name](**kwargs).get_model()
+    model = MODELS[model_name](**kwargs).get_model()
+    log_print(logger, f"model: {model_name} is successfully loaded!")
+    return model

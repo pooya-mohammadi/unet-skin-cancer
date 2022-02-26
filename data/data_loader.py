@@ -2,6 +2,7 @@ import os
 import math
 import random
 import cv2
+from deep_utils import log_print
 from sklearn.model_selection import train_test_split
 import numpy as np
 import albumentations as A
@@ -21,7 +22,7 @@ class DataGenerator(tf.keras.utils.Sequence):
                  img_size,
                  img_channel,
                  augmentation_p: float,
-                 p_random_rotate_90,
+                 random_rotate_p,
                  p_horizontal_flip,
                  p_vertical_flip,
                  p_center_crop,
@@ -39,14 +40,19 @@ class DataGenerator(tf.keras.utils.Sequence):
         self.usual_aug_with_cutmix = usual_aug_with_cutmix
         self.mask_channel = 2 if double_unet else 1
         self.transform = A.Compose([
-            A.RandomRotate90(p=p_random_rotate_90),
+            A.Rotate(limit=180, p=random_rotate_p),
             A.VerticalFlip(p=p_vertical_flip),
             A.HorizontalFlip(p=p_horizontal_flip),
-            A.CenterCrop(p=p_center_crop, height=img_size[1], width=img_size[0]),
+            A.CenterCrop(p=p_center_crop, height=img_size[0], width=img_size[1]),
             A.OneOf(
-                [HairAugmentation(p=hair_aug_p), HairRemoval(p=hair_rmv_p),
-                 Identity(p=1 if hair_aug_p == 0 and hair_rmv_p == 0 else 0)], p=0.5),
-        ], p=augmentation_p)
+                [
+                    HairAugmentation(p=hair_aug_p),
+                    HairRemoval(p=hair_rmv_p),
+                    Identity(p=1 if hair_aug_p == 0 and hair_rmv_p == 0 else 0)],
+                # apply identity if both has zero prob
+                p=0.5),
+        ], p=augmentation_p
+        )
         self.img_size = img_size
         self.img_channel = img_channel
         self.cutmix_p = cutmix_p
@@ -78,7 +84,7 @@ class DataGenerator(tf.keras.utils.Sequence):
                 if self.usual_aug_with_cutmix:
                     augmented = self.transform(image=img, mask=mask)
                     img, mask = augmented['image'], augmented['mask']
-                x[i] = img[..., ::-1]
+                x[i] = img[..., ::-1]  # BGR2RGB
                 y[i] = mask
             x, y = CutMix.seg_cutmix(self.beta, image_a=x, mask_a=y)
         else:
@@ -106,6 +112,8 @@ def get_loader(train_input_dir,
                val_size=0.2,
                batch_size=8,
                img_size=(256, 256),
+               seed=1234,
+               logger=None,
                **kwargs):
     # should there be only one direction?
     # how are we supposed to get the other 4 directions of train test and images and masks for each
@@ -129,9 +137,10 @@ def get_loader(train_input_dir,
     train_img_paths, val_img_paths, train_mask_paths, val_mask_paths = train_test_split(train_img_paths,
                                                                                         train_mask_paths,
                                                                                         test_size=val_size,
-                                                                                        shuffle=True)
-    train_img_paths = train_img_paths + train_img_paths
-    train_mask_paths = train_mask_paths + train_mask_paths
+                                                                                        shuffle=True,
+                                                                                        random_state=seed)
+    # train_img_paths = train_img_paths + train_img_paths
+    # train_mask_paths = train_mask_paths + train_mask_paths
 
     test_img_paths = sorted(
         [
@@ -156,7 +165,7 @@ def get_loader(train_input_dir,
                           img_channel=kwargs.get('img_channel'),
                           augmentation_p=0.5,
                           double_unet=double_unet,
-                          p_random_rotate_90=kwargs.get("p_random_rotate_90"),
+                          random_rotate_p=kwargs.get("random_rotate_p"),
                           p_horizontal_flip=kwargs.get("p_horizontal_flip"),
                           p_vertical_flip=kwargs.get("p_vertical_flip"),
                           p_center_crop=kwargs.get("p_center_crop"),
@@ -177,7 +186,7 @@ def get_loader(train_input_dir,
                         cutmix_p=0,
                         beta=1,
                         usual_aug_with_cutmix=False,
-                        p_random_rotate_90=kwargs.get("p_random_rotate_90"),
+                        random_rotate_p=kwargs.get("random_rotate_p"),
                         p_horizontal_flip=kwargs.get("p_horizontal_flip"),
                         p_vertical_flip=kwargs.get("p_vertical_flip"),
                         p_center_crop=kwargs.get("p_center_crop"),
@@ -196,7 +205,7 @@ def get_loader(train_input_dir,
                          cutmix_p=0,
                          beta=1,
                          usual_aug_with_cutmix=False,
-                         p_random_rotate_90=kwargs.get("p_random_rotate_90"),
+                         random_rotate_p=kwargs.get("random_rotate_p"),
                          p_horizontal_flip=kwargs.get("p_horizontal_flip"),
                          p_vertical_flip=kwargs.get("p_vertical_flip"),
                          p_center_crop=kwargs.get("p_center_crop"),
@@ -204,4 +213,5 @@ def get_loader(train_input_dir,
                          hair_aug_p=kwargs.get("hair_aug_p"),
                          hair_rmv_p=kwargs.get("hair_rmv_p"),
                          )
+    log_print(logger, "Data Loader is successfully loaded!")
     return train, val, test

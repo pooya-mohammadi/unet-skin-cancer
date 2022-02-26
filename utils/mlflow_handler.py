@@ -2,6 +2,7 @@ import os
 from os.path import join
 import mlflow
 import mlflow.tensorflow
+from deep_utils import log_print
 from tensorflow.keras.callbacks import Callback
 import datetime
 
@@ -12,19 +13,15 @@ class MLFlowLogger(Callback):
         self.mlflow = mlflow
 
     def on_epoch_end(self, epoch, logs=None):
-        self.mlflow.log_metric('train dice', logs['dice'], step=epoch)
-        self.mlflow.log_metric('val dice', logs['val_dice'], step=epoch)
-        self.mlflow.log_metric('train iou', logs['iou'], step=epoch)
-        self.mlflow.log_metric('val iou', logs['val_iou'], step=epoch)
-        self.mlflow.log_metric('train loss', logs['loss'], step=epoch)
-        self.mlflow.log_metric('val_loss', logs['val_loss'], step=epoch)
+        for key, val in logs.items():
+            self.mlflow.log_metric(key, val, step=epoch)
 
     def on_train_begin(self, logs=None):
         self.mlflow.log_param('optimizer_name', type(self.model.optimizer).__name__)
 
 
 class MLFlowHandler:
-    def __init__(self, model_name, run_name, mlflow_source, run_ngrok):
+    def __init__(self, model_name, run_name, mlflow_source, run_ngrok=False, logger=None):
         self.mlflow = mlflow
         self.run_ngrok = run_ngrok
         self.mlflow_source = mlflow_source
@@ -36,6 +33,8 @@ class MLFlowHandler:
             self.run_name = model_name + "_" + str(datetime.datetime.now().date()) + "_" + str(
                 datetime.datetime.now().time())
         self.model_name = model_name
+        self.logger = logger
+        log_print(self.logger, "Successfully created MLFLOW-Handler")
 
     @staticmethod
     def colab_ngrok(mlflow_source):

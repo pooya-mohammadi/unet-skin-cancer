@@ -8,7 +8,7 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.applications import ResNet50
 
 
-class UnetRes50():
+class UnetRes50:
     def __init__(self, img_w=256, img_h=256, channels=3, **kwargs):
         self.input_shape = (img_w, img_h, channels)
 
