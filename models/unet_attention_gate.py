@@ -1,5 +1,6 @@
 from utils.attentionGate import *
 
+
 class GateUnet:
     def __init__(self, img_w=256, img_h=256, channels=3, **kwargs):
         self.input_shape = (img_w, img_h, channels)
@@ -36,17 +37,20 @@ class GateUnet:
         g2 = UnetGatingSignal(up1, is_batchnorm=True, name='g2')
         attn2 = AttnGatingBlock(conv3, g2, 64, '_2')
         up2 = concatenate(
-            [Conv2DTranspose(64, (3, 3), strides=(2, 2), padding='same', activation='relu', kernel_initializer=kinit)(up1),
+            [Conv2DTranspose(64, (3, 3), strides=(2, 2), padding='same', activation='relu', kernel_initializer=kinit)(
+                up1),
              attn2], name='up2')
 
         g3 = UnetGatingSignal(up1, is_batchnorm=True, name='g3')
         attn3 = AttnGatingBlock(conv2, g3, 32, '_3')
         up3 = concatenate(
-            [Conv2DTranspose(32, (3, 3), strides=(2, 2), padding='same', activation='relu', kernel_initializer=kinit)(up2),
+            [Conv2DTranspose(32, (3, 3), strides=(2, 2), padding='same', activation='relu', kernel_initializer=kinit)(
+                up2),
              attn3], name='up3')
 
         up4 = concatenate(
-            [Conv2DTranspose(32, (3, 3), strides=(2, 2), padding='same', activation='relu', kernel_initializer=kinit)(up3),
+            [Conv2DTranspose(32, (3, 3), strides=(2, 2), padding='same', activation='relu', kernel_initializer=kinit)(
+                up3),
              conv1], name='up4')
         out = Conv2D(1, (1, 1), activation='sigmoid', kernel_initializer=kinit, name='final')(up4)
 

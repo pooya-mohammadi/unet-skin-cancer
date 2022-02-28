@@ -5,7 +5,9 @@ import numpy as np
 
 def get_mean_std(csv_lists,
                  arguments=("accuracy", "loss", "val_accuracy", "val_loss"),
-                 operators=(max, min, max, min)
+                 operators=(max, min, max, min),
+                 save_path=None,
+                 logger=None,
                  ):
     metrics = defaultdict(list)
     print(f"[INFO] Extracting values from csv files...")
@@ -18,6 +20,10 @@ def get_mean_std(csv_lists,
 
     metrics = {metric: {"std": round(np.std(val_list), 4), "mean": round(np.mean(val_list), 4)} for metric, val_list in
                metrics.items()}
+    if save_path is not None:
+        df = pd.DataFrame([[val['mean'], val['std']] for _, val in metrics.items()], columns=['mean', 'std'],
+                          index=list(metrics.keys()))
+        df.to_csv(save_path)
     return metrics
 
 

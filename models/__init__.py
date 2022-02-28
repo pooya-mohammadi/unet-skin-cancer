@@ -20,7 +20,7 @@ MODELS = dict(unet_res50=UnetRes50,
               unet_pyramid_cbam_gate=Pyramid_Cbam_Gate_Unet,
               mcg_unet=MCGUNET,
               r2unet=R2Unet,
-              R2Unet_CBAM=R2Unet_CBAM
+              r2unet_cbam=R2Unet_CBAM
               )
 
 

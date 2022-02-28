@@ -113,5 +113,4 @@ class MCGUNET:
 
         model = Model(inputs=[input_img], outputs=[conv9])
 
-        model.summary()
         return model

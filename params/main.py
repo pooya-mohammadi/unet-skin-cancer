@@ -47,9 +47,6 @@ def main_args():
 
     parser.add_argument('--usual_aug_with_cutmix', dest='usual_aug_with_cutmix', action='store_true',
                         help="Apply aug while applying cutmix")
-    parser.add_argument('--not_usual_aug_with_cutmix', dest='usual_aug_with_cutmix', action='store_false',
-                        help="Don't apply aug while applying cutmix")
-    parser.set_defaults(usual_aug_with_cutmix=False)
     # Plots
 
     # augmentation
@@ -67,6 +64,19 @@ def main_args():
                         help='probability to apply p_center_crop')
     parser.add_argument('--mosaic_p', type=float, default=0.5,
                         help='probability to apply mosaic_p')
+    parser.add_argument("--hue_shift_limit", type=float, default=1,
+                        help=" this is for defining hue_shift_limit, default is 0.5")
+    parser.add_argument("--sat_shift_limit", type=float, default=0,
+                        help=" this is for defining sat_shift_limit, default is 0.5")
+    parser.add_argument("--contrast_limit", type=float, default=0.1,
+                        help=" this is for defining contrast_limit, default is 0.5")
+    parser.add_argument("--brightness_limit", type=float, default=0.1,
+                        help=" this is for defining brightness_limit, default is 0.5")
+    parser.add_argument("--hue_p", type=float, default=0.5, help=" this is for defining hue_p, default is 0.5")
+    parser.add_argument("--contrast_p", type=float, default=0.5,
+                        help=" this is for defining contrast_p, default is 0.5")
+    parser.add_argument("--brightness_p", type=float, default=0.5,
+                        help=" this is for defining brightness_p, default is 0.5")
 
     # Loss Function
     parser.add_argument('--loss', type=str, default='dice_loss',

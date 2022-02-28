@@ -54,6 +54,5 @@ class UnetRes50:
         """ Output """
         outputs = Conv2D(1, 1, padding="same", activation="sigmoid")(d4)
         model = Model(inputs, outputs, name="ResNet50_U-Net")
-        model.summary()
 
         return model

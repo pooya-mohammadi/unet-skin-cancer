@@ -31,6 +31,13 @@ class DataGenerator(tf.keras.utils.Sequence):
                  hair_rmv_p,
                  shuffle=True,
                  double_unet=False,
+                 hue_shift_limit=0,
+                 sat_shift_limit=0,
+                 contrast_limit=0,
+                 brightness_limit=0,
+                 hue_p=0.5,
+                 contrast_p=0.5,
+                 brightness_p=0.5,
                  ):
         self.img_paths = np.array(img_list)
         self.mask_paths = np.array(mask_list)
@@ -39,6 +46,7 @@ class DataGenerator(tf.keras.utils.Sequence):
         self.shuffle = shuffle
         self.usual_aug_with_cutmix = usual_aug_with_cutmix
         self.mask_channel = 2 if double_unet else 1
+        self.augmentation_p = augmentation_p
         self.transform = A.Compose([
             A.Rotate(limit=180, p=random_rotate_p),
             A.VerticalFlip(p=p_vertical_flip),
@@ -51,7 +59,12 @@ class DataGenerator(tf.keras.utils.Sequence):
                     Identity(p=1 if hair_aug_p == 0 and hair_rmv_p == 0 else 0)],
                 # apply identity if both has zero prob
                 p=0.5),
-        ], p=augmentation_p
+            A.HueSaturationValue(hue_shift_limit=hue_shift_limit,
+                                 sat_shift_limit=sat_shift_limit,
+                                 val_shift_limit=0, p=hue_p),
+            A.RandomContrast(limit=contrast_limit, p=contrast_p),
+            A.RandomBrightness(limit=brightness_limit, p=brightness_p),
+        ], p=self.augmentation_p
         )
         self.img_size = img_size
         self.img_channel = img_channel
@@ -75,7 +88,7 @@ class DataGenerator(tf.keras.utils.Sequence):
         y = np.zeros((self.batch_size, *self.img_size), dtype=np.uint8)
 
         rnd_p = random.random()
-        if rnd_p < self.cutmix_p:
+        if rnd_p < self.cutmix_p * self.augmentation_p:
             for i, (img_path, mask_path) in enumerate(zip(batch_img, batch_mask)):
                 img = cv2.imread(img_path)
                 mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
@@ -95,7 +108,8 @@ class DataGenerator(tf.keras.utils.Sequence):
                 mask = cv2.resize(mask, self.img_size, interpolation=cv2.INTER_NEAREST)
                 augmented = self.transform(image=img, mask=mask)
                 img, mask = augmented['image'], augmented['mask']
-                img, mask = mosaic_aug(img, mask, self.img_paths, self.mask_paths, self.img_size, p=self.p_mosaic)
+                img, mask = mosaic_aug(img, mask, self.img_paths, self.mask_paths, self.img_size,
+                                       p=self.p_mosaic * self.augmentation_p)
                 x[i] = img[..., ::-1]
                 y[i] = mask
 
@@ -175,6 +189,13 @@ def get_loader(train_input_dir,
                           cutmix_p=kwargs.get('cutmix_p'),
                           usual_aug_with_cutmix=kwargs.get('usual_aug_with_cutmix'),
                           beta=kwargs.get('beta'),
+                          hue_shift_limit=kwargs.get("hue_shift_limit"),
+                          sat_shift_limit=kwargs.get("sat_shift_limit"),
+                          contrast_limit=kwargs.get("contrast_limit"),
+                          brightness_limit=kwargs.get("brightness_limit"),
+                          hue_p=kwargs.get("hue_p"),
+                          contrast_p=kwargs.get("contrast_p"),
+                          brightness_p=kwargs.get("brightness_p")
                           )
     val = DataGenerator(val_img_paths,
                         val_mask_paths,
@@ -193,6 +214,13 @@ def get_loader(train_input_dir,
                         p_mosaic=kwargs.get("p_mosaic"),
                         hair_aug_p=kwargs.get("hair_aug_p"),
                         hair_rmv_p=kwargs.get("hair_rmv_p"),
+                        hue_shift_limit=kwargs.get("hue_shift_limit"),
+                        sat_shift_limit=kwargs.get("sat_shift_limit"),
+                        contrast_limit=kwargs.get("contrast_limit"),
+                        brightness_limit=kwargs.get("brightness_limit"),
+                        hue_p=kwargs.get("hue_p"),
+                        contrast_p=kwargs.get("contrast_p"),
+                        brightness_p=kwargs.get("brightness_p")
                         )
     test = DataGenerator(test_img_paths,
                          test_mask_paths,
@@ -212,6 +240,13 @@ def get_loader(train_input_dir,
                          p_mosaic=kwargs.get("p_mosaic"),
                          hair_aug_p=kwargs.get("hair_aug_p"),
                          hair_rmv_p=kwargs.get("hair_rmv_p"),
+                         hue_shift_limit=kwargs.get("hue_shift_limit"),
+                         sat_shift_limit=kwargs.get("sat_shift_limit"),
+                         contrast_limit=kwargs.get("contrast_limit"),
+                         brightness_limit=kwargs.get("brightness_limit"),
+                         hue_p=kwargs.get("hue_p"),
+                         contrast_p=kwargs.get("contrast_p"),
+                         brightness_p=kwargs.get("brightness_p")
                          )
     log_print(logger, "Data Loader is successfully loaded!")
     return train, val, test

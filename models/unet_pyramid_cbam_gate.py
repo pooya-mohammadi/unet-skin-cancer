@@ -4,6 +4,7 @@ from utils.cbam import *
 from utils.attentionGate import *
 from utils.cbam import *
 
+
 class Pyramid_Cbam_Gate_Unet:
     def __init__(self, img_w=256, img_h=256, channels=3, **kwargs):
         self.input_shape = (img_w, img_h, channels)

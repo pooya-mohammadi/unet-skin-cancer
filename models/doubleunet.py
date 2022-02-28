@@ -149,8 +149,8 @@ def ASPP(x, filter):
 
 
 class DoubleUnet:
-    def __init__(self, shape=(256, 256, 3)):
-        self.shape = shape
+    def __init__(self, img_w=256, img_h=256, img_channels=3, **kwargs):
+        self.shape = (img_w, img_h, img_channels)
 
     def get_model(self):
         inputs = Input(self.shape)
