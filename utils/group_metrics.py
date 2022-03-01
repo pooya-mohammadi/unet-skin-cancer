@@ -1,6 +1,7 @@
 from collections import defaultdict
 import pandas as pd
 import numpy as np
+from deep_utils import log_print
 
 
 def get_mean_std(csv_lists,
@@ -10,9 +11,9 @@ def get_mean_std(csv_lists,
                  logger=None,
                  ):
     metrics = defaultdict(list)
-    print(f"[INFO] Extracting values from csv files...")
+    log_print(logger, f"Extracting values from csv files...")
     for csv in csv_lists:
-        print(f"[INFO] Getting the values of file {csv}")
+        log_print(logger, f"Getting the values of file {csv}")
         csv_file = pd.read_csv(csv)
         for metric, op in zip(arguments, operators):
             val = op(csv_file[metric])
@@ -24,6 +25,8 @@ def get_mean_std(csv_lists,
         df = pd.DataFrame([[val['mean'], val['std']] for _, val in metrics.items()], columns=['mean', 'std'],
                           index=list(metrics.keys()))
         df.to_csv(save_path)
+        log_print(logger, f"Saving extracted file to {save_path}")
+
     return metrics
 
 
