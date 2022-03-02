@@ -3,7 +3,7 @@
 ## Download dataset
 To download & preprocess the data:
 
-`python data\preprocessing.py`
+`python data/preprocessing.py train-path data/train ...`
 
 To train the model:
 
