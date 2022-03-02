@@ -10,4 +10,4 @@ To train the model:
 `python train.py --model <model-name> ...`
 
 ## Try Jupyter notebook
-`train.ipynb`
+`train-2016.ipynb`
