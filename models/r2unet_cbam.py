@@ -114,7 +114,7 @@ class R2Unet_CBAM:
     def __init__(self, img_w=256, img_h=256, img_channels=3, filter_num=[64, 128, 256, 512], n_labels=1,
                  stack_num_down=2, stack_num_up=2, recur_num=2,
                  activation='ReLU', output_activation='Sigmoid',
-                 batch_norm=False, pool=True, unpool=True, name='r2_unet_cbam'):
+                 batch_norm=True, pool=True, unpool=True, name='r2_unet_cbam'):
         self.input_size = (img_w, img_h, img_channels)
         self.filter_num = filter_num
         self.n_labels = n_labels

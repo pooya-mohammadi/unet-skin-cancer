@@ -17,9 +17,9 @@ def main_args():
                         help='Define the number of training epochs. Default = 10')
 
     # learning rate reduce on plateau
-    parser.add_argument('--lr', type=float, default=0.001,
+    parser.add_argument('--lr', type=float, default=0.01,
                         help=' learning rate. Default is 0.001')
-    parser.add_argument('--min_lr', type=float, default=0.001,
+    parser.add_argument('--min_lr', type=float, default=0.00001,
                         help='min_lr learning rate. Default is 0.001')
 
     # Callbacks
