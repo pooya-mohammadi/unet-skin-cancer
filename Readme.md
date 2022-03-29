@@ -1,9 +1,10 @@
 # Skin-Cancer-Segmentation
 
 ## Download dataset
-To download & preprocess the data:
-
-`python data/preprocessing.py train-path data/train ...`
+To download & preprocess the data, run the following module. In case of `URL fetch failure` turn on your VPN.
+```
+python data/preprocessing.py --train_path data/train --test_path data/test --mask_train_path data/mask_train --mask_test_path data/mask_test
+```
 
 To train the model:
 
