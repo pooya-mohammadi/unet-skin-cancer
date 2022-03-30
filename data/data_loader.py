@@ -2,7 +2,7 @@ import os
 import math
 import random
 import cv2
-from deep_utils import log_print, CutMixAug
+from deep_utils import log_print, CutMixTF
 from sklearn.model_selection import train_test_split
 import numpy as np
 import albumentations as A
@@ -98,7 +98,7 @@ class DataGenerator(tf.keras.utils.Sequence):
                     img, mask = augmented['image'], augmented['mask']
                 x[i] = img[..., ::-1]  # BGR2RGB
                 y[i] = mask
-            x, y = CutMixAug.seg_cutmix_batch(a_images=x, a_masks=y, beta=self.beta)
+            x, y = CutMixTF.seg_cutmix_batch(a_images=x, a_masks=y, beta=self.beta)
         else:
             for i, (img_path, mask_path) in enumerate(zip(batch_img, batch_mask)):
                 img = cv2.imread(img_path)
