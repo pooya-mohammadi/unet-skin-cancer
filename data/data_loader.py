@@ -105,16 +105,17 @@ class DataGenerator(tf.keras.utils.Sequence):
                 mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
                 img = cv2.resize(img, self.img_size)
                 mask = cv2.resize(mask, self.img_size, interpolation=cv2.INTER_NEAREST)
-                augmented = self.transform(image=img, mask=mask)
+                augmented = self.transform(image=img,
+                                           mask=mask)  # at test time, self.augmentation_p is set to zero, so it doesn't make any change
                 img, mask = augmented['image'], augmented['mask']
                 img, mask = mosaic_aug(img, mask, self.img_paths, self.mask_paths, self.img_size,
-                                       p=self.p_mosaic * self.augmentation_p)
+                                       p=self.p_mosaic * self.augmentation_p)  # at test time, self.augmentation_p is set to zero, so it doesn't make any change
                 x[i] = img[..., ::-1]
                 y[i] = mask
 
-        y = y.reshape((self.batch_size, *self.img_size, 1)) / 255
+        y = y.reshape((self.batch_size, *self.img_size, 1)) / 255  # normalization is done for all the samples
         y = np.concatenate([y] * self.mask_channel, axis=-1)
-        return x / 255, y
+        return x / 255, y  # normalization is done for all the samples
 
 
 def get_loader(train_input_dir,
