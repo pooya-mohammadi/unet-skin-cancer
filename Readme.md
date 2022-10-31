@@ -1,4 +1,4 @@
-# Skin-Cancer-Segmentation
+# Unet Skin Cancer
 
 ## Download dataset
 To download & preprocess the data, run the following module. In case of `URL fetch failure` turn on your VPN.
