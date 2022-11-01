@@ -1,5 +1,5 @@
 # U-Net-based Models for Skin Lesion Segmentation: More Attention and Augmentation
-This repository is associated with [this paper](https://arxiv.org/abs/2210.16399). In this work we investigated making use of attention modules to overcome some problems with the basic U-Net architectures. Also, different augmentation methods are deployed.
+This repository is associated with [this paper](https://arxiv.org/abs/2210.16399). In this work we investigated making use of attention modules to overcome some problems with the basic U-Net architectures. Also, different augmentation methods are deployed. The project is publicized here for reproduction purposes. Please follow the succeeding instructions.
 
 ## Download dataset
 To download & preprocess the data, run the following module. In case of `URL fetch failure` turn on your VPN.
