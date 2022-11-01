@@ -1,4 +1,4 @@
-# Unet Skin Cancer
+# U-Net-based Models for Skin Lesion Segmentation: More Attention and Augmentation
 
 ## Download dataset
 To download & preprocess the data, run the following module. In case of `URL fetch failure` turn on your VPN.
@@ -13,3 +13,5 @@ To train the model:
 
 ## Try Jupyter notebook
 `train-2016.ipynb`
+
+[Paper Link](https://arxiv.org/abs/2210.16399)
