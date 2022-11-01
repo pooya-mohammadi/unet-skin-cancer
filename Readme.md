@@ -20,20 +20,4 @@ To train the model:
 ## Cite as
 If you have benefited from our work, please consider citing us with the following Bibtex citation format:
 
-@misc{https://doi.org/10.48550/arxiv.2210.16399,
-  doi = {10.48550/ARXIV.2210.16399},
-  
-  url = {https://arxiv.org/abs/2210.16399},
-  
-  author = {Kazaj, Pooya Mohammadi and Koosheshi, MohammadHossein and Shahedi, Ali and Sadr, Alireza Vafaei},
-   
-  keywords = {Image and Video Processing (eess.IV), Computer Vision and Pattern Recognition (cs.CV), Machine Learning (cs.LG), FOS: Electrical engineering, electronic engineering, information engineering, FOS: Electrical engineering, electronic engineering, information engineering, FOS: Computer and information sciences, FOS: Computer and information sciences},
-  
-  title = {U-Net-based Models for Skin Lesion Segmentation: More Attention and Augmentation},
-  
-  publisher = {arXiv},
-  
-  year = {2022},
-  
-  copyright = {Creative Commons Attribution 4.0 International}
-}
+`@misc{https://doi.org/10.48550/arxiv.2210.16399, doi = {10.48550/ARXIV.2210.16399}, url = {https://arxiv.org/abs/2210.16399}, author = {Kazaj, Pooya Mohammadi and Koosheshi, MohammadHossein and Shahedi, Ali and Sadr, Alireza Vafaei}, keywords = {Image and Video Processing (eess.IV), Computer Vision and Pattern Recognition (cs.CV), Machine Learning (cs.LG), FOS: Electrical engineering, electronic engineering, information engineering, FOS: Electrical engineering, electronic engineering, information engineering, FOS: Computer and information sciences, FOS: Computer and information sciences}, title = {U-Net-based Models for Skin Lesion Segmentation: More Attention and Augmentation}, publisher = {arXiv}, year = {2022}, copyright = {Creative Commons Attribution 4.0 International}}`
