@@ -11,7 +11,7 @@ To download & preprocess the data, run the following module. In case of `URL fet
 python data/preprocessing.py --train_path data/train --test_path data/test --mask_train_path data/mask_train --mask_test_path data/mask_test
 ```
 
-## Train the model:
+## Train the model
 
 `python train.py --model <model-name> ...`
 
