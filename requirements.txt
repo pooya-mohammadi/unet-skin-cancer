@@ -1,4 +1,4 @@
-deep_utils>=0.8.20
+deep_utils==0.8.20
 tensorflow>=2.8.0
 tensorboard>=2.8.0
 scikit-learn>=1.0.2
